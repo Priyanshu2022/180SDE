@@ -221,3 +221,135 @@ int main()
 
 
 
+// if the rows are sorted separately and columns separately
+// we can start from last element of first column 
+// and move left if target is less and down if target is more
+    
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        int low=0;
+        int high=matrix.size()*matrix[0].size()-1;
+        while(low<=high){
+            int mid=(low+high)/2;
+            if(matrix[mid/matrix[0].size()][mid%matrix[0].size()]>target){
+                high=mid-1;
+            }
+            else if(matrix[mid/matrix[0].size()][mid%matrix[0].size()]<target){
+                low=mid+1;
+            }
+            else{
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+// pow(x,n)
+// if n is even n=n/2 x=x*2
+// if n is odd  n=n-1 ans=ans*x
+double myPow(double x, int n) {
+        double ans=1.0;
+        long long int nn=n;
+        if(nn<0) nn=nn*-1;
+        while(nn){
+            if(nn%2==1){
+                nn=nn-1;
+                ans*=x;
+            }
+            else{
+                nn=nn/2;
+                x*=x;
+            }
+        }
+        if(n<0){
+            ans=(double)1.0/(double)ans;
+        }
+        return ans;
+    }
+
+// el=-1
+// count =0
+// if(count==0) el=a[i]
+// if(el==a[i]) count++
+// else count--;
+
+// return el
+int majorityElement(vector<int>& a) {
+        int count=0;
+        int element=-1;
+        for(int i=0;i<a.size();i++){
+            if(count==0) element=a[i];
+            if(element==a[i]) count++;
+            else count--;
+        }
+        return element;
+    }
+
+// recursive dp or iterative dp
+// or simply total paths =(n-1)+(m-1)=n+m-2
+// choose n-1 from total choices
+// n+m-2Cn-1
+int func(int i,int j,int m,int n,vector<vector<int>>& dp){
+        if(i>=n || j>=m) return 0;
+        if(i==n-1 && j==m-1) return 1;
+        if(dp[i][j]!=-1) return dp[i][j];
+        int down=func(i+1,j,m,n,dp);
+        int right=func(i,j+1,m,n,dp);
+        return dp[i][j]=right+down;
+    }
+    int uniquePaths(int m, int n) {
+        int i=0;
+        int j=0;
+        vector<vector<int>> dp(m,vector<int> (n,-1));
+        // return func(i,j,m,n,dp);
+        dp[0][0]=1;
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(i==0 && j==0) continue;
+                if(i==0) dp[i][j]=dp[i][j-1];
+                else if(j==0) dp[i][j]=dp[i-1][j];
+                else dp[i][j]=dp[i-1][j]+dp[i][j-1];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+
+
+int merge(vector<int>& nums,int start,int end,int mid){
+        int count=0;
+        int l=start,h=mid+1;
+        while(l<=mid && h<=end){
+            if((long long int)nums[l]>(long long int)2*nums[h]){
+                count+=(mid-l+1);
+                h++;
+            }
+            else l++;
+        }
+        int temp[end-start+1];
+        int t=0;
+        l=start,h=mid+1;
+        while(l<=mid && h<=end){
+            if(nums[l]>nums[h]){
+                temp[t++]=nums[h++];
+            }
+            else temp[t++]=nums[l++];
+        }
+        while(l<=mid) temp[t++]=nums[l++];
+        while(h<=end) temp[t++]=nums[h++];
+        for(int i=0;i<end-start+1;i++){
+            nums[start+i]=temp[i];
+        }
+        return count;
+    }
+    int mergeSort(vector<int>& nums,int start,int end){
+        if(start>=end) return 0;
+        int mid=(start+end)/2;
+        int count=mergeSort(nums,start,mid);
+        count+=mergeSort(nums,mid+1,end);
+        count+=merge(nums,start,end,mid);
+        return count;
+    }
+    int reversePairs(vector<int>& nums) {
+        return mergeSort(nums,0,nums.size()-1);
+    }
+
