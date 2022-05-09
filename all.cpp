@@ -380,3 +380,86 @@ vector<int> majorityElement(vector<int>& nums) {
         
         return ans;   
     }
+
+
+// 2 sum
+
+// 4 sum
+
+// check subarray sum 
+// if it is update
+// else is already present in map update length
+// or put it in map
+int maxLen(vector<int>&A, int n)
+    {   
+        unordered_map<int,int> mp;
+        int sum=0;
+        int ans=0;
+        for(int i=0;i<A.size();i++){
+            sum+=A[i];
+            if(sum==0) ans=max(ans,i+1);
+            else{
+                if(mp[sum]==0){
+                    mp[sum]=i+1;
+                }
+                else{
+                    ans=max(ans,i+1-mp[sum]);
+                }
+            }
+        }
+        return ans;
+    }
+
+// check if cur-1 present in map
+// if present , continue;
+// else count from there
+int longestConsecutive(vector<int>& nums) {
+        unordered_map<int,int> mp;
+        for(auto cur:nums){
+            mp[cur]++;
+        }
+        int ans=0;
+        for(auto cur:nums){
+            if(mp[cur-1]!=0) continue;
+            else{
+                int count=0;
+                int temp=cur;
+                while(mp[temp]!=0){
+                    count++;
+                    temp++;
+                }
+                ans=max(count,ans);
+            }
+        }
+        return ans;
+    }
+
+
+// left to right is our substring
+// if s[right] is in map update left
+// map stores char and its index
+// ans=max(ans,right-left+1)
+int lengthOfLongestSubstring(string s) {
+         unordered_map<char,int> mp;
+         int left=0;
+         int right=0;
+         int n =s.length();
+         int ans=0;
+        while(right<n){
+            if(mp.find(s[right])!=mp.end()) left=max(left,mp[s[right]]+1);
+            mp[s[right]]=right; 
+            ans=max(ans,right-left+1);
+            right++;
+        }
+        return ans;
+    }
+
+
+// subarray with given xor
+// unordered_map<int,int> =>xor , no of time
+// let the given xor be k
+// y^k=x (...(y)...(k)==(x))
+// y=k^x
+// how many subarrays with xor y is present when xor till now is x
+
+    
