@@ -462,4 +462,104 @@ int lengthOfLongestSubstring(string s) {
 // y=k^x
 // how many subarrays with xor y is present when xor till now is x
 
-    
+
+ListNode* reverseList(ListNode* head) {
+        ListNode* newHead=NULL;
+        while(head){
+            ListNode* temp=head->next;
+            head->next=newHead;
+            newHead=head;
+            head=temp;
+        }
+        return newHead;
+    }
+
+
+ListNode* middleNode(ListNode* head) {
+        ListNode* slow=head;
+        ListNode* fast=head;
+        while(fast!=NULL && fast->next!=NULL){
+            slow=slow->next;
+            fast = fast->next->next;
+        }
+        return slow;
+    }
+
+
+ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        ListNode* temp=new ListNode(-1);
+        ListNode* ans=temp;
+
+        while(list1 and list2){
+            if((list1->val)>(list2->val)){
+                temp->next=list2;
+                list2=list2->next;  
+            }
+            else{
+                temp->next=list1;
+                list1=list1->next;
+            }
+            temp=temp->next;
+        }
+        while(list1){
+            temp->next=list1;
+            list1=list1->next;
+            temp=temp->next;
+        }
+        while(list2){
+            temp->next=list2;
+            list2=list2->next;
+            temp=temp->next;
+        }
+        return ans->next;
+    } 
+
+
+// run fast pointer for n times
+// then run slow and fast untill fast->next
+ListNode* removeNthFromEnd(ListNode* head, int n) {
+        ListNode* start=new ListNode();
+        start->next=head;
+        ListNode* slow=start;
+        ListNode* fast=start;
+        for(int i=0;i<n;i++){
+            fast=fast->next;
+        }
+        while(fast->next){
+            fast=fast->next;
+            slow=slow->next;
+        }
+        slow->next=slow->next->next;
+        return start->next;
+    } 
+
+
+void deleteNode(ListNode* node) {
+        node->val=node->next->val;
+        node->next=node->next->next;
+    }
+
+
+// while((l1||l2)||carry)
+ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* temp=new ListNode();
+        ListNode* dummy=temp;
+        int carry=0;
+        while((l1||l2) || carry){
+            int sum=0;
+            if(l1!=NULL){
+                sum+=l1->val;
+                l1=l1->next;
+            }
+            if(l2!=NULL){
+                sum+=l2->val;
+                l2=l2->next;
+            }
+            sum+=carry;
+            ListNode* node=new ListNode(sum%10);
+            carry=sum/10;
+            temp->next=node;
+            temp=temp->next;
+        }
+        return dummy->next;
+     }
