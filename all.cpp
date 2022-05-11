@@ -563,3 +563,155 @@ ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
         }
         return dummy->next;
      }
+
+
+// a=headA
+// b=headB
+// run till a!=b
+// if a is null move it to b's start,else to the next of a
+// if b is null move it to a's start,alse to the next of b
+ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        ListNode* a=headA;
+        ListNode* b=headB;
+        while(a!=b){
+            a= a==NULL?headB:a->next;
+            b= b==NULL?headA:b->next;
+        }
+        return a;
+    }
+
+// while(fast->next && fast->next->next)
+bool hasCycle(ListNode *head) {
+        ListNode* slow=head;
+        ListNode* fast=head;
+        if(head==NULL || head->next==NULL) return false;
+        while(fast->next && fast->next->next){
+            if(slow->next==fast->next->next) return true;
+            slow=slow->next;
+            fast=fast->next->next;
+        }
+        return false;
+    }
+
+
+// go to middle of ll(one before the middle) then reverse it from there
+// make slow's next to reverseLL
+// then check untill slow
+ListNode* reverseList(ListNode* head) {
+        ListNode* newHead=NULL;
+        while(head){
+            ListNode* temp=head->next;
+            head->next=newHead;
+            newHead=head;
+            head=temp;
+        }
+        return newHead;
+    }
+    bool isPalindrome(ListNode* head) {
+        ListNode* slow=head;
+        ListNode* fast=head;
+        while(fast->next && fast->next->next){
+            slow=slow->next;
+            fast=fast->next->next;
+        }
+        slow->next=reverseList(slow->next);
+        slow=slow->next;
+        while(slow){
+            if(slow->val!=head->val) return false;
+            slow=slow->next;
+            head=head->next;
+        }
+        return true;
+    }
+
+
+// merge sort in linked list
+// find mid point
+// separate two linked list
+// call recursive merge sort in left and right
+// then merge two sorted linked list
+
+// 1->2->3->4->5->6    k=2
+// first check if from current head there are k element present or not
+// reverse first k elements using counter
+// check if not cur node is not null again call for recursion and make it head's next
+// at last return prev (new head first reversed list)
+ListNode* reverseKGroup(ListNode* head, int k) {
+        if(head==NULL) return NULL;
+        
+        ListNode* temp=head;
+        for(int i=0;i<k;i++){
+            if(!temp) return head;
+            temp=temp->next;
+        }
+        
+        int count=0;
+        ListNode* next=NULL;
+        ListNode* cur=head;
+        ListNode* prev=NULL;
+        while(cur!=NULL && count<k){
+            next=cur->next;
+            cur->next=prev;
+            prev=cur;
+            cur=next;
+            count++;
+        }
+        if(cur!=NULL){
+            head->next=reverseKGroup(cur,k);
+        }
+        return prev;
+    }
+
+
+// flatten means everythin from root should be in bottom
+// merge root and flattened list from root->next
+Node* merge(Node* root,Node* next){
+        if(root==NULL) return next;
+        if(next==NULL) return root;
+        Node* ans=new Node(-1);
+        Node* temp=ans;
+        while(root!=NULL && next!=NULL){
+            if(root->data>next->data){
+                temp->bottom=next;
+                next=next->bottom;
+                temp=temp->bottom;
+            }
+            else{
+                temp->bottom=root;
+                root=root->bottom;
+                temp=temp->bottom;
+            }
+        }
+        if(root) temp->bottom=root;
+        else temp->bottom=next;
+        
+        return ans->bottom;
+    }
+Node *flatten(Node *root)
+{
+   if(root==NULL) return NULL;
+   return merge(root,flatten(root->next));
+}
+
+
+// slow (move by 1) and fast (move by 2) at head
+// if slow and fast are equal break and point fast to head 
+// now move both one by one
+ListNode *detectCycle(ListNode *head) {
+        ListNode* slow=head;
+        ListNode* fast=head;
+        if(head==NULL || head->next==NULL) return NULL;
+        while(fast->next && fast->next->next){
+            slow=slow->next;
+            fast=fast->next->next;
+            if(slow==fast) break;
+        }
+        if(fast->next==NULL || fast->next->next==NULL) return NULL;
+        fast=head;
+        while(fast!=slow){
+            slow=slow->next;
+            fast=fast->next;
+        }
+        return slow;
+    }
+
