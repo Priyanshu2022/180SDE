@@ -715,3 +715,152 @@ ListNode *detectCycle(ListNode *head) {
         return slow;
     }
 
+
+// trapping rain water
+// brute can be , we can calculate water stored at each index
+// min(max_in_left,max_in_right)-hight_of_current_index
+// time -> n*n , space -> 1
+// if we use prefix and suffix  max 
+// time -> n , space -> n
+// OPTIMAL
+// l=0,r=n-1,res=0
+// leftMax=0,rightMax=0
+// if(a[l]<=a[r]) if(a[l]>=leftmax) leftmax=a[l] else res+=(leftMax-a[l]); l++(for both)
+// else if(a[r]>=rightmax) rightmax=a[r] else res+=(rightmax-a[r]) ; r--
+// basically we are doing min(leftmax,rightmax)-a[i]
+int trap(vector<int>& a) {
+        int l=0;
+        int r=a.size()-1;
+        int ans=0;
+        int leftMax=0;
+        int rightMax=0;
+        while(l<=r){
+            if(a[l]<=a[r]){
+                if(a[l]<=leftMax) ans+=leftMax-a[l];
+                else leftMax=a[l];
+                l++;
+            }
+            else{
+                if(a[r]<=rightMax) ans+=rightMax-a[r];
+                else rightMax=a[r];
+                r--;
+            }
+        }
+        return ans;
+    }
+
+
+// calculate length
+// k=k%len
+// make cur point to last
+// and connect last to first
+// now k=len-k
+// move cur k times
+// head as cur's next and cur->next as NULL
+ListNode* rotateRight(ListNode* head, int k) {
+        if(head==NULL || head->next==NULL || k==0) return head;
+        int len=1;
+        ListNode* cur=head;
+        while(cur->next){
+            cur=cur->next;
+            len++;
+        }
+        cur->next=head;
+        k=k%len;
+        k=len-k;
+        while(k--) cur=cur->next;
+        head=cur->next;
+        cur->next=NULL;
+        return head;
+    }
+
+
+// maximum consecutive one's
+// if(nums[i]==1) count++ and update ans
+// else count=0
+int findMaxConsecutiveOnes(vector<int>& nums) {
+        int ans=0;
+        int count=0;
+        for(int i=0;i<nums.size();i++)
+        {
+            if(nums[i]==1)
+            {
+                count++;
+                ans=max(count,ans);
+            }
+            else
+            {
+                count=0;
+            }
+        }
+        return ans;
+    }
+
+
+
+// 3 sum
+
+
+// if( a[i]!=a[j]) i++ and a[i]=a[j];
+int removeDuplicates(vector<int>& a) {
+        if(a.size()==0) return 0;
+        int i=0;
+        for(int j=0;j<a.size();j++){
+            if(a[i]!=a[j]){
+                i++;
+                a[i]=a[j];
+            }
+        }
+        return i+1;
+    }
+
+
+// **********************************************************************************************************
+// clone linked list with next and random pointer
+// firstly we can use a map of node , node and create copy node's and make , original node's value as copy node
+// OR
+// OPTIMAL
+// 3 steps
+// 1st step
+// make copy of each node and link them side by side in single list i.e. 1->1'->2->2'->3->3'
+// 2nd step
+// assign random pointers for copy nodes
+// 3rd step
+// restore the original list, and extract copy list (by assigning correct next pointers)
+Node* copyRandomList(Node* head) {
+        Node* iter=head;
+        Node* front=head;
+        
+        while(iter!=NULL){
+            front=iter->next;
+            Node*copy=new Node(iter->val);
+            iter->next=copy;
+            copy->next=front;
+            iter=front;
+        }
+        
+        iter=head;
+        while(iter!=NULL){
+            if(iter->random!=NULL){
+                iter->next->random=iter->random->next;
+            }
+            iter=iter->next->next;
+        }
+        
+        iter=head;
+        Node* pseudoHead=new Node(0);
+        Node* copy=pseudoHead;
+        while(iter!=NULL){
+            front=iter->next->next;
+            
+            copy->next=iter->next;
+            
+            iter->next=front;
+            
+            iter=iter->next;
+            copy=copy->next;
+        }
+        return pseudoHead->next;
+    }
+
+
