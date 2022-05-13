@@ -864,3 +864,135 @@ Node* copyRandomList(Node* head) {
     }
 
 
+
+// sort the meeting according to end time
+// take the first meeting in ans
+// and mark it's end time as limit
+// now iterate and check if currents start time is greater than limit if yes ans++
+// and update limit as cur's end time
+struct meeting{
+        int s;
+        int e;
+        int p;
+    };
+    static bool cmp(struct meeting m1, struct meeting m2){
+        if(m1.e<m2.e) return true;
+        else if(m1.e>m2.e) return false;
+        else if(m1.p<m2.p) return true;
+        else return false;
+    }
+    int maxMeetings(int start[], int end[], int n)
+    {
+        struct meeting meet[n];
+        for(int i=0;i<n;i++){
+            meet[i].s=start[i];
+            meet[i].e=end[i];
+            meet[i].p=i+1;
+        }
+        sort(meet,meet+n,cmp);
+        int ans=1;
+        int limit=meet[0].e;
+        for(int i=1;i<n;i++){
+            if(meet[i].s>limit){
+                limit=meet[i].e;
+                ans++;
+            }
+        }
+        return ans;
+    }
+
+
+// sort according profit by weight
+// and take elements 
+    static bool cmp(struct Item i1,struct Item i2){
+        return (double)(((double)i1.value/(double)i1.weight)>((double)i2.value/(double)i2.weight));
+    }
+    double fractionalKnapsack(int W, Item arr[], int n)
+    {
+        sort(arr,arr+n,cmp);
+        int cur=0;
+        double ans=0;
+        for(int i=0;i<n;i++){
+            if(arr[i].weight+cur<=W){
+                ans+=arr[i].value;
+                cur+=arr[i].weight;
+            }
+            else{
+                ans+=(double)((double)arr[i].value/(double)arr[i].weight)*(double)(W-cur);
+                break;
+            }
+        }
+        return ans;
+    }
+
+
+// sort the job's according to the profit(descending) and try to the job 
+// as late as possible by taking occupied array , marked with -1 at the start
+static bool cmp(struct Job a1,struct Job a2){
+        return a1.profit>a2.profit;
+    }
+    vector<int> JobScheduling(Job arr[], int n) 
+    { 
+        sort(arr,arr+n,cmp);
+        int num=0;
+        int profit=0;
+        int occupied[101];
+        for(int i=0;i<101;i++) occupied[i]=-1;
+        for(int i=0;i<n;i++){
+            for(int j=arr[i].dead;j>0;j--){
+                if(occupied[j]==-1){
+                    occupied[j]=i;
+                    num++;
+                    profit+=arr[i].profit;
+                    break;
+                }
+            }
+        }
+        vector<int> ans;
+        ans.push_back(num);
+        ans.push_back(profit);
+        return ans;
+    } 
+
+
+// sort both arrival and departure
+int findPlatform(int arr[], int dep[], int n)
+    {
+        int cur=1;
+        int ans=1;
+        sort(arr,arr+n);
+        sort(dep,dep+n);
+        int i=1;
+        int j=0;
+        while(i<n && j<n){
+            if(arr[i]<=dep[j]){
+                cur++;
+                i++;
+            }
+            else{
+                cur--;
+                j++;
+            }
+            ans=max(ans,cur);
+        }
+        return ans;
+    }
+
+
+// take the current and do not change i or leave the current and change the i
+int solve(int i,int amount,vector<int>& coins,vector<vector<int>> &dp){
+        if(amount==0) return 0;
+        if(amount<0 || i>=coins.size()) return INT_MAX-1;
+        if(dp[i][amount]!=-1) return dp[i][amount];
+        return dp[i][amount]=min(1+solve(i,amount-coins[i],coins,dp),solve(i+1,amount,coins,dp));
+    }
+    int coinChange(vector<int>& coins, int amount) {
+        vector<vector<int>> dp(coins.size(),vector<int>(amount+1,-1));
+        int ans=solve(0,amount,coins,dp);
+        if(ans==INT_MAX-1) return -1;
+        else return ans;
+    }
+
+
+
+
