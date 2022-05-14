@@ -1034,6 +1034,8 @@ bool solve(vector<vector<int>> &ans,vector<int> ds,int index,vector<int> arr,int
 
 // ***********************************
 // print all subsequence using power set
+// space complexity is constant
+// time complexity is 2^n * n
 // a b c
 // 0 0 0 represent no char taken
 // 0 0 1 represent a is taken
