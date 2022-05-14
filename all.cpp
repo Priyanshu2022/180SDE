@@ -995,4 +995,328 @@ int solve(int i,int amount,vector<int>& coins,vector<vector<int>> &dp){
 
 
 
+// print all subsequences
+// take , not take
+// time -> 2^n
+// space -> n (at max n recursion calls will be waiting in the stack space)
+void solve(vector<vector<int>> &ans,vector<int> ds,int index,vector<int> arr){
+    if(index==arr.size()){
+        ans.push_back(ds);
+        return;
+    }
+    ds.push_back(arr[index]);
+    solve(ans,ds,index+1,arr);
+    ds.pop_back();
+    solve(ans,ds,index+1,arr);
+}
+
+// if want just one subsequence of given sum
+// by bool and returning , we are avoiding further recursion calls
+bool solve(vector<vector<int>> &ans,vector<int> ds,int index,vector<int> arr,int sum){
+    if(index==arr.size()){
+        if(sum==0){
+            ans.push_back(ds);
+            return true;
+        }
+        return false;
+    }
+    ds.push_back(arr[index]);
+    if(solve(ans,ds,index+1,arr,sum-arr[index])) return true;
+    ds.pop_back();
+    if(solve(ans,ds,index+1,arr)) return true;
+}
+
+// no of subsequence with sum, sum
+// base case if condition satisfy return 1 else 0
+// at last return solve(included)+solve(not included)
+// tc=2^n sc=
+
+
+// ***********************************
+// print all subsequence using power set
+// a b c
+// 0 0 0 represent no char taken
+// 0 0 1 represent a is taken
+// for(num=0 to 2^n-1 (i.e (1<<n)-1)){
+//  sub=""
+//  for(i=0 to n-1){
+//      if(num&(i<<1)){
+//          sub+=s[i];
+//      }
+//  }
+//  ans push_back or print
+// }
+
+
+
+
+
+
+void findcombination(int index,int target,vector<int>& candidates,vector<vector<int>>& ans,vector<int>& ds){
+        if(index==candidates.size()){
+            if(target==0){
+                ans.push_back(ds);
+            }
+            return;
+        }
+        if(candidates[index]<=target){
+            ds.push_back(candidates[index]);
+            findcombination(index,target-candidates[index],candidates,ans,ds);
+            ds.pop_back();
+        }
+        findcombination(index+1,target,candidates,ans,ds);
+    }
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<int>> ans;
+        vector<int> ds;
+        findcombination(0,target,candidates,ans,ds);
+        return ans;
+    }
+
+
+
+
+// tc=2^n*k (k  is average length)
+// sc=k*x (x is total combinations) (ignorign auxiliary space)
+// cannot pick a element more than once
+    void combinationSum(int ind,int target,vector<int>& candidates,vector<vector<int>> &ans,vector<int> &ds){
+
+        if(target==0){
+            ans.push_back(ds);
+            return;
+        }
+        
+        // for the same index we will not element of same value
+        // we are one by one pickinig our first element 
+        // then second element
+        for(int i=ind;i<candidates.size();i++){
+            if(i>ind && candidates[i]==candidates[i-1]) continue;
+            if(candidates[i]>target) break; // if not able to pick this , can't pick ahead (as sorted)
+            ds.push_back(candidates[i]);
+            combinationSum(i+1,target-candidates[i],candidates,ans,ds);
+            ds.pop_back();
+        }
+    }
+    vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+        // in combination sum 2, combinations should not repeat
+        vector<vector<int>> ans;
+        vector<int> ds;
+        sort(candidates.begin(),candidates.end()); // we want solution in lexiographic order
+        // we will put subsequences
+        combinationSum(0,target,candidates,ans,ds);
+        return ans;
+    }
+
+
+
+// n queen
+// iterate in every column
+// try to put in every column of a row
+// check if valid
+// we can optimize this using hashing
+// using if in same column a queen is present we can skip it and sum of i , j in lower diagonal is same so we can check 
+// if present in lower diagonal 
+// for upper diagonal n-1 + col -row is same
+bool isValid(int row,int col,vector<string> &board,int n){
+        int i=row;
+        // checking all rows in that column
+        while(i>=0){
+            if(board[i][col]=='Q') return false;
+            i--;
+        }
+        i=row;
+        int j=col;
+        while(i>=0 && j>=0){
+            if(board[i][j]=='Q') return false;
+            i--;
+            j--;
+        }
+        i=row;
+        j=col;
+        while(i>=0 && j<n){
+            if(board[i][j]=='Q') return false;
+            i--;
+            j++;
+        }
+        return true;
+    }
+    void solve(vector<vector<string>> &ans,vector<string> &board,int n,int row){
+        if(row==n){
+            ans.push_back(board);
+            return;
+        }
+        for(int i=0;i<n;i++){
+            if(isValid(row,i,board,n)){
+                board[row][i]='Q';
+                solve(ans,board,n,row+1); // place and try in next row
+                board[row][i]='.';
+            }
+        }
+    }
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string>> ans;
+        vector<string> board(n);
+        string s(n,'.');
+        for(int i=0;i<n;i++){
+            board[i]=s;
+        }
+        solve(ans,board,n,0);
+        return ans;
+    }
+
+
+
+
+// print all permutations
+// first we can use a map , which will store which element  i have taken
+// tc=n! * n    sc=n + n
+void recurPermute(vector < int > & ds, vector < int > & nums, vector < vector < int >> & ans, int freq[]) {
+      if (ds.size() == nums.size()) {
+        ans.push_back(ds);
+        return;
+      }
+      for (int i = 0; i < nums.size(); i++) {
+        if (!freq[i]) {
+          ds.push_back(nums[i]);
+          freq[i] = 1;
+          recurPermute(ds, nums, ans, freq);
+          freq[i] = 0;
+          ds.pop_back();
+        }
+      }
+    }
+  public:
+    vector < vector < int >> permute(vector < int > & nums) {
+      vector < vector < int >> ans;
+      vector < int > ds;
+      int freq[nums.size()];
+      for (int i = 0; i < nums.size(); i++) freq[i] = 0;
+      recurPermute(ds, nums, ans, freq);
+      return ans;
+    }
+
+
+// better answer
+// tc n!*n
+// sc -> only to store answer n! and stack space of n
+void solve(int index,vector<vector<int>> &ans,vector<int> &nums){
+        if(index==nums.size()){
+            ans.push_back(nums);
+            return;
+        }
+        // swapping index with i , so that we can have all elements possible at the start
+        for(int i=index;i<nums.size();i++){
+            swap(nums[index],nums[i]);
+            solve(index+1,ans,nums);
+            swap(nums[index],nums[i]);
+        }
+    }
+    
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int>> ans;
+        solve(0,ans,nums);
+        return ans;
+    }
+
+
+
+// recursion
+// stack space contains funtion yet to be completed
+// space complexity is number of funtion call waiting at maximum
+// time complexity number of funtion calls
+
+// fibonacci
+// time complexity=2^n
+// space complexity=
+
+
+
+// subsets
+void solve(int index,vector<int> nums,vector<vector<int>> &ans,vector<int> &temp){
+        if(index==nums.size()){
+            ans.push_back(temp);
+            return;
+        }
+        solve(index+1,nums,ans,temp);
+        temp.push_back(nums[index]);
+        solve(index+1,nums,ans,temp);
+        temp.pop_back();
+    }
+public:
+    vector<vector<int>> subsets(vector<int>& nums) {
+        vector<vector<int>> ans;
+        vector<int> temp;
+        solve(0,nums,ans,temp);
+        return ans;
+    }
+
+
+
+// subsets 2
+// The solution set must not contain duplicate subsets
+void func(int index,vector<vector<int>> &ans,vector<int> &ds,vector<int>& nums){
+        ans.push_back(ds);
+        for(int i=index;i<nums.size();i++){
+            if(i>index && nums[i]==nums[i-1]) continue;
+            ds.push_back(nums[i]);
+            func(i+1,ans,ds,nums);
+            ds.pop_back();
+        }
+    }
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        vector<vector<int>> ans;
+        vector<int> ds;
+        sort(nums.begin(),nums.end());
+        func(0,ans,ds,nums);
+        return ans;
+    }
+
+
+// sudoku solver
+// bool function (we want just one answer)
+// iterate and check where empty cell is present
+// try to put char from 1 to 9 
+// if valid put and call for next 
+// if this returns true return true;
+// else mark again empty
+// if after putting 1 to 9 in empty it does not return true  , 
+// then return false ** (means this config is not correct) backtrack
+// if every cell is marked means at the end return true
+bool isValid(int row,int col,char check,vector<vector<char>> &boards){
+        for(int i=0;i<9;i++){
+            if(boards[row][i]==check) return false;
+            if(boards[i][col]==check) return false;
+            if(boards[3*(row/3)+i/3][3*(col/3)+i%3]==check) return false;
+        }
+        return true;
+    }
+    bool solve(vector<vector<char>>&boards){
+        for(int i=0;i<boards.size();i++){
+            for(int j=0;j<boards[0].size();j++){
+                if(boards[i][j]=='.'){
+                    for(char c='1';c<='9';c++){
+                        if(isValid(i,j,c,boards)){
+                            boards[i][j]=c;
+                            if(solve(boards)==true){
+                                return true;
+                            }
+                            else{
+                                boards[i][j]='.';
+                            }
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    void solveSudoku(vector<vector<char>>& boards) {
+        bool temp=solve(boards);
+    }
+
+
+
+
 
