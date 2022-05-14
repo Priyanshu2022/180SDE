@@ -1321,4 +1321,91 @@ bool isValid(int row,int col,char check,vector<vector<char>> &boards){
 
 
 
+// is it possible to colour the graph with m colours
+// try to color current node with every color
+// bool funtion because only check if we can
+bool issafe(int node,int color[],bool graph[101][101],int n,int i){
+    for(int k=0;k<n;k++){
+        if(k!=node && graph[k][node]==1 && color[k]==i) return false;
+    }
+    return true;
+}   
+bool solve(int node,bool graph[101][101],int m,int n,int color[]){
+    if(node==n) return true;
+    for(int i=1;i<=m;i++){
+        if(issafe(node,color,graph,n,i)){
+            color[node]=i;
+            if(solve(node+1,graph,m,n,color)) return true;
+            color[node]=0;
+        }
+    }
+    return false;
+}
+bool graphColoring(bool graph[101][101], int m, int V)
+{
+    int color[V]={0};
+    return solve(0,graph,m,V,color);
+}
+
+
+
+// Given a string s, partition s such that every substring of the partition is a palindrome. 
+// Return all possible palindrome partitioning of s.
+bool isPalindrome(int start,int end,string &s){
+        while(start<=end){
+            if(s[start++]!=s[end--]) return false;
+        }
+        return true;
+    }
+    void solve(int index,string &s,vector<vector<string>> &ans,vector<string> &path){
+        if(index==s.length()){
+            ans.push_back(path);
+            return ;
+        }
+        for(int i=index;i<s.length();i++){
+            if(isPalindrome(index,i,s)){
+                path.push_back(s.substr(index,i-index+1));
+                solve(i+1,s,ans,path);
+                path.pop_back();
+            }
+        }
+    }
+    vector<vector<string>> partition(string s) {
+        vector<vector<string>> ans;
+        vector<string> path;
+        solve(0,s,ans,path);
+        return ans;
+    }
+
+
+
+
+void solve(vector<string> &ans,string s,int i,int j,vector<vector<int>> &m,int n,vector<vector<int>> &vis){
+        if(i==n-1 && j==n-1 ){
+            ans.push_back(s);
+            return;
+        }
+        if(i>=n || i<0 || j>=n || j<0 || m[i][j]==0 || vis[i][j]==1){
+            return;
+        }
+        vis[i][j]=1;
+        solve(ans,s+'D',i+1,j,m,n,vis);
+        solve(ans,s+'U',i-1,j,m,n,vis);
+        solve(ans,s+'R',i,j+1,m,n,vis);
+        solve(ans,s+'L',i,j-1,m,n,vis);
+        vis[i][j]=0;
+    }
+    public:
+    vector<string> findPath(vector<vector<int>> &m, int n) {
+        
+        vector<string> ans;
+        if(m[n-1][n-1]==0) return ans;
+        string s="";
+        vector<vector<int>> vis(n,vector<int>(n,0));
+        solve(ans,s,0,0,m,n,vis);
+        return ans;
+    }
+
+
+
 
