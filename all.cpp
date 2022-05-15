@@ -1408,4 +1408,54 @@ void solve(vector<string> &ans,string s,int i,int j,vector<vector<int>> &m,int n
 
 
 
+// word break 
+// return true if we can break s , into space separated strings of words of wordDict
+bool solve(int i,string s,unordered_map<string,int> &dict,vector<int> &dp){
+        if(i==s.length()) return true;
+        if(dp[i]!=-1) return dp[i];
+        string temp;
+        for(int j=i;j<s.length();j++){
+            temp+=s[j];
+            if(dict.find(temp)!=dict.end()){
+                if(solve(j+1,s,dict,dp)) return dp[i]=true;
+            }
+        }
+        return dp[i]=false;
+    }
+    bool wordBreak(string s, vector<string>& wordDict) {
+        vector<int> dp(s.length(),-1);
+        unordered_map<string,int> dict;
+        for(int i=0;i<wordDict.size();i++) dict[wordDict[i]]++;
+        return solve(0,s,dict,dp);
+    }
+
+
+
+
+// permutation sequence
+// 1 2 3 4
+// 1 {2 3 4} -> 6 -> (n-1)!
+// 2 {1 3 4} -> 6
+// 3 {1 2 4} ....
+// 4 {1 2 3} ....
+string getPermutation(int n, int k) {
+        vector<int> numbers;
+        int fact=1;
+        // calculating (n-1)!
+        for(int i=1;i<n;i++){
+            fact=fact*i;
+            numbers.push_back(i);
+        }
+        numbers.push_back(n);
+        string ans="";
+        k=k-1; // zero based indexing 
+        while(true){
+            ans+=to_string(numbers[k/fact]);
+            numbers.erase(numbers.begin()+k/fact);
+            if(numbers.size()==0) break;
+            k=k%fact;
+            fact=fact/numbers.size();
+        }
+        return ans;
+    }
 
