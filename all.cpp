@@ -1459,3 +1459,255 @@ string getPermutation(int n, int k) {
         return ans;
     }
 
+
+
+// find nth root of m
+// which number should be multiplied n times , so that we can get m
+int power(int mid,int n,int m){
+        long long int ans=1;
+        for(int i=1;i<=n;i++){
+            ans*=mid;
+            if(ans>m) return m+2; // can never be the answer
+        }
+        return (int) ans;
+    }
+    int NthRoot(int n, int m)
+    {
+        int l=0;
+        int h=m;
+        while(l<=h){
+            int mid=(l+h)/2;
+            int p=power(mid,n,m);
+            if(p==m) return mid;
+            else if(p>m) h=mid-1;
+            else l=mid+1;
+        }
+        return -1;
+    } 
+
+
+
+
+bool isPossible(int a[],int n,int m,int mid){
+        int sum=0;
+        int student=1;
+        for(int i=0;i<n;i++){
+            if(sum+a[i]<=mid){
+                sum+=a[i];
+            }
+            else{
+                student++;
+                if(student>m || a[i]>mid) return false;
+                sum=a[i];
+            }
+        }
+        return true;
+    }
+    int findPages(int A[], int N, int M) 
+    {
+        int ans=-1;
+        int sum=0;
+        for(int i=0;i<N;i++) sum+=A[i];
+        int l=0;
+        int h=sum;
+        while(l<=h){
+            int mid=l+(h-l)/2;
+            if(isPossible(A,N,M,mid)){
+                ans=mid;
+                h=mid-1;
+            }
+            else l=mid+1;
+        }
+        return ans;
+    }
+
+
+
+// kth element of two sorted arrays
+int kthElement(int arr1[], int arr2[], int n, int m, int k)
+    {
+        if(n>m) return kthElement(arr2,arr1,m,n,k);
+        int l=max(0,k-m);
+        int h=min(n,k);
+        while(l<=h){
+            int cut1=(l+h)/2;
+            int cut2=k-cut1;
+            int l1=(cut1==0)?INT_MIN:arr1[cut1-1];
+            int l2=(cut2==0)?INT_MIN:arr2[cut2-1];
+            int r1=(cut1==n)?INT_MAX:arr1[cut1];
+            int r2=(cut2==m)?INT_MAX:arr2[cut2];
+            if(l1<=r2 && l2<=r1) return max(l1,l2);
+            else if(l1>r2){
+                h=cut1-1;
+            }
+            else l=cut1+1;
+        }
+        return -1;
+    }
+
+
+
+
+
+// median of two sorted arrays
+// l=0, h=n1;
+// cut1=(l+h)/2 , cut2=(n1+n2+1)/2-cut1
+// if l1 <=r2 && l2<=r1 check if n1+n2 is odd or even
+// if( l1>r2) then we will have to reduce therefore h=cut1-1
+double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int n1=nums1.size();
+        int n2=nums2.size();
+        if(n1>n2) return findMedianSortedArrays(nums2,nums1);
+        int l=0;
+        int h=n1;
+        while(l<=h){
+            int cut1=(l+h)/2;
+            int cut2=(n1+n2+1)/2 -cut1;
+            
+            int l1=(cut1==0)?INT_MIN:nums1[cut1-1];
+            int l2=(cut2==0)?INT_MIN:nums2[cut2-1];
+            int r1=(cut1==n1)?INT_MAX:nums1[cut1];
+            int r2=(cut2==n2)?INT_MAX:nums2[cut2];
+            
+            if(l1<=r2 && l2<=r1){
+                if((n1+n2)%2==0){
+                    return (max(l1,l2)+min(r1,r2))/2.0;
+                }
+                else return max(l1,l2);
+            }
+            else if(l1>r2){
+                h=cut1-1;
+            }
+            else l=cut1+1;
+        }
+        return -1;
+    }
+
+
+
+#include <bits/stdc++.h>
+using namespace std;
+ 
+bool isPossible(int a[],int mid,int c,int n){
+    int cowCount=1;
+    int lastPos=a[0];
+    for(int i=0;i<n;i++){
+        if(a[i]-lastPos>=mid){
+            cowCount++;
+            if(cowCount==c) return true;
+            lastPos=a[i];
+        }
+    }
+    return false;
+}
+ 
+int main() {
+    int t;
+    cin>>t;
+    while(t--){
+        int n,c;
+        cin>>n>>c;
+        int a[n];
+        for(int i=0;i<n;i++) cin>>a[i];
+        sort(a,a+n);
+        int l=0;
+        int h=a[n-1];
+        int ans=-1;
+        while(l<=h){
+            int mid=l+(h-l)/2;
+            if(isPossible(a,mid,c,n)){
+                ans=mid;
+                l=mid+1;
+            }
+            else h=mid-1;
+        }
+        cout<<ans<<endl;
+    }
+    return 0;
+}  
+
+
+
+
+
+int search(vector<int>& nums, int target) {
+        int n=nums.size();
+        int l=0;
+        int h=n-1;
+        int pivot=-1;
+        while(l<h){
+            int m=(l+h)/2;
+            if(nums[m]>=nums[0]) l=m+1;
+            else h=m;
+        }
+        pivot=l;
+        if(nums[pivot]<=target && target<=nums[n-1]){
+            l=pivot;
+            h=n-1;
+        }
+        else{
+            l=0;
+            h=pivot-1;
+        }
+        while(l<=h){
+            int m=(l+h)/2;
+            if(nums[m]==target) return m;
+            else if(nums[m]>target) h=m-1;
+            else l=m+1;
+        }
+        return -1;
+    }
+
+
+
+// single element in sorted array
+int singleNonDuplicate(vector<int>& nums) {
+        int l=0;
+        int h=nums.size()-1;
+        while(l<h){
+            int m=(l+h)/2;
+            if((m%2==0 && nums[m]==nums[m+1]) || (m%2!=0 && nums[m]==nums[m-1])){
+                l=m+1;
+            }
+            else{
+                h=m;
+            }
+        }
+        return nums[h];
+    }
+
+
+
+
+// median in row wise sorted matrix
+// answer can be in the range 0 to 1e9
+// for each mid calculate how many numbers are smaller than or equal to this
+int countSmallerThanEqualTo(vector<int> &v,int mid){
+        int l=0;
+        int h=v.size()-1;
+        while(l<=h){
+            int m=(l+h)/2;
+            if(v[m]<=mid) l=m+1;
+            else h=m-1;
+        }
+        return l;
+    }
+    int median(vector<vector<int>> &matrix, int r, int c){
+        int n=matrix.size();
+        int m=matrix[0].size();
+        int low=0;
+        int high=1e9;
+        while(low<=high){
+            int mid=(low+high)/2;
+            int count=0;
+            for(int i=0;i<n;i++){
+                count+=countSmallerThanEqualTo(matrix[i],mid);
+            }
+            if(count<=(n*m)/2) low=mid+1;
+            else high=mid-1;
+        }
+        return low;
+    }
+
+
+    
