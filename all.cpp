@@ -1895,3 +1895,346 @@ class Trie {
 
 
 // two more problems
+
+
+
+vector<long long> nextLargerElement(vector<long long> arr, int n){
+        stack<long long > st;
+        st.push(-1);
+        vector<long long> ans;
+        for(int i=n-1;i>=0;i--){
+            while(st.top()!=-1 && st.top()<=arr[i]) st.pop();
+            ans.push_back(st.top());
+            st.push(arr[i]);
+        }
+        reverse(ans.begin(),ans.end());
+        return ans;
+    }
+
+
+
+class MyQueue {
+public:
+    stack<int> s1;
+    stack<int> s2;
+    MyQueue() {
+        
+    }
+    
+    void push(int x) {
+        s1.push(x);
+    }
+    
+    int pop() {
+        while(!s1.empty()){
+            s2.push(s1.top());
+            s1.pop();
+        }
+        int ans=s2.top();
+        s2.pop();
+        while(!s2.empty()){
+            s1.push(s2.top());
+            s2.pop();
+        }
+        return ans;
+    }
+    
+    int peek() {
+        while(!s1.empty()){
+            s2.push(s1.top());
+            s1.pop();
+        }
+        int ans=s2.top();
+        while(!s2.empty()){
+            s1.push(s2.top());
+            s2.pop();
+        }
+        return ans;
+    }
+    
+    bool empty() {
+        return s1.empty();
+    }
+};
+
+
+// pop the elements
+// insert in sorted order
+// means insert when top is smaller or empty
+void sortedInsert(stack<int> &stack, int num) {
+    //base case
+    if(stack.empty() || (!stack.empty() && stack.top() < num) ) {
+        stack.push(num);
+        return;
+    }
+    
+    int n = stack.top();
+    stack.pop();
+    
+    //recusrive call
+    sortedInsert(stack, num);
+    
+    stack.push(n);
+}
+
+void sortStack(stack<int> &stack)
+{
+        //base case
+        if(stack.empty()) {
+            return ;
+        }
+    
+        int num = stack.top();
+        stack.pop();
+    
+        //recursive call
+        sortStack(stack);
+    
+        sortedInsert(stack, num);
+}
+
+
+// stack using arrays
+#include<bits/stdc++.h>
+
+using namespace std;
+class Stack {
+  int size;
+  int * arr;
+  int top;
+  public:
+    Stack() {
+      top = -1;
+      size = 1000;
+      arr = new int[size];
+    }
+  void push(int x) {
+    top++;
+    arr[top] = x;
+  }
+  int pop() {
+    int x = arr[top];
+    top--;
+    return x;
+  }
+  int Top() {
+    return arr[top];
+  }
+  int Size() {
+    return top + 1;
+  }
+};
+int main() {
+
+  Stack s;
+  s.push(6);
+  s.push(3);
+  s.push(7);
+  cout << "Top of stack is before deleting any element " << s.Top() << endl;
+  cout << "Size of stack before deleting any element " << s.Size() << endl;
+  cout << "The element deleted is " << s.pop() << endl;
+  cout << "Size of stack after deleting an element " << s.Size() << endl;
+  cout << "Top of stack after deleting an element " << s.Top() << endl;
+  return 0;
+}
+
+// queue using arrays
+#include<bits/stdc++.h>
+
+using namespace std;
+class Queue {
+  int * arr;
+  int start, end, currSize, maxSize;
+  public:
+    Queue() {
+      arr = new int[16];
+      start = -1;
+      end = -1;
+      currSize = 0;
+    }
+
+  Queue(int maxSize) {
+    ( * this).maxSize = maxSize;
+    arr = new int[maxSize];
+    start = -1;
+    end = -1;
+    currSize = 0;
+  }
+  void push(int newElement) {
+    if (currSize == maxSize) {
+      cout << "Queue is full\nExiting..." << endl;
+      exit(1);
+    }
+    if (end == -1) {
+      start = 0;
+      end = 0;
+    } else
+      end = (end + 1) % maxSize;
+    arr[end] = newElement;
+    cout << "The element pushed is " << newElement << endl;
+    currSize++;
+  }
+  int pop() {
+    if (start == -1) {
+      cout << "Queue Empty\nExiting..." << endl;
+    }
+    int popped = arr[start];
+    if (currSize == 1) {
+      start = -1;
+      end = -1;
+    } else
+      start = (start + 1) % maxSize;
+    currSize--;
+    return popped;
+  }
+  int top() {
+    if (start == -1) {
+      cout << "Queue is Empty" << endl;
+      exit(1);
+    }
+    return arr[start];
+  }
+  int size() {
+    return currSize;
+  }
+
+};
+
+int main() {
+  Queue q(6);
+  q.push(4);
+  q.push(14);
+  q.push(24);
+  q.push(34);
+  cout << "The peek of the queue before deleting any element " << q.top() << endl;
+  cout << "The size of the queue before deletion " << q.size() << endl;
+  cout << "The first element to be deleted " << q.pop() << endl;
+  cout << "The peek of the queue after deleting an element " << q.top() << endl;
+  cout << "The size of the queue after deleting an element " << q.size() << endl;
+
+  return 0;
+}
+
+
+
+
+// some questions of stack
+// reverse a string using a stack
+// stack has a property of reversing
+string str="hello"
+stack <char> st;
+for(int i=0;i<str.lengnt();i++){
+    st.push(str[i]);
+}
+string ans="";
+while(!st.empty()){
+    ans+=st.top();
+    st.pop();
+}
+return ans; 
+
+// delete middle element from stack
+// jaate huye leke jana num
+void solve(stack<int> &s,int n,int count){
+        if(count==n/2){
+            s.pop();
+            return ;
+        }
+        int num=s.top();
+        s.pop();
+        solve(s,n,count+1);
+        s.push(num);
+    }
+    void deleteMid(stack<int>&s, int sizeOfStack)
+    {
+        solve(s,sizeOfStack,0);
+    }
+
+
+ // similarly , insert a element at a bottom
+
+
+ // reverse a stack using recursion
+ // store the top element
+// call the recursive fucntion for left over stack
+// then put the top element at the bottom
+
+
+
+// stack using queue
+class MyStack {
+public:
+    // queue<int> q1;
+    // queue<int> q2;
+    queue<int> q;
+    MyStack() {
+        
+    }
+    
+    void push(int x) {
+        // q2.push(x);
+        // while(!q1.empty()){
+        //     q2.push(q1.front());
+        //     q1.pop();
+        // }
+        // swap(q1,q2);
+        q.push(x);
+        for(int i=0;i<q.size()-1;i++){
+            q.push(q.front());
+            q.pop();
+        }
+    }
+    
+    int pop() {
+        // int ans=q1.front();
+        // q1.pop();
+        // return ans;
+        int ans=q.front();
+        q.pop();
+        return ans;
+    }
+    
+    int top() {
+        // return q1.front();
+        return q.front();
+    }
+    
+    bool empty() {
+        // return q1.empty();
+        return q.empty();
+    }
+};
+
+
+bool isValid(string s) {
+        stack<char> st;
+        for(int i=0;i<s.length();i++)
+        {
+            if(s[i]=='(' || s[i]=='{' || s[i]=='[')
+            {
+                st.push(s[i]);
+            }
+            else if(st.empty()){
+                return false;
+            }
+            if(s[i]==')')
+            {
+                if(st.top()!='(') return false;
+                else st.pop();
+            }
+            if(s[i]=='}')
+            {
+                if(st.top()!='{') return false;
+                else st.pop();
+            }
+            if(s[i]==']')
+            {
+                if(st.top()!='[') return false;
+                else st.pop();
+            }
+        }
+        return st.empty();
+
+        
+        
+    }
