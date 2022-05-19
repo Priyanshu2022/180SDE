@@ -2238,3 +2238,234 @@ bool isValid(string s) {
         
         
     }
+
+
+
+// largest rectangle in histogram
+vector<int> nextSmaller(vector<int> & heights,int n){
+        stack<int> st;
+        st.push(-1);
+        vector<int> ans(n);
+        for(int i=n-1;i>=0;i--){
+            while(st.top()!=-1 && heights[st.top()]>=heights[i]) st.pop();
+            ans[i]=st.top();
+            st.push(i);
+        }
+        return ans;
+    }
+    vector<int> prevSmaller(vector<int> & heights,int n){
+        stack<int> st;
+        st.push(-1);
+        vector<int> ans(n);
+        for(int i=0;i<n;i++){
+            while(st.top()!=-1 && heights[st.top()]>=heights[i]) st.pop();
+            ans[i]=st.top();
+            st.push(i);
+        }
+        return ans;
+    }
+    int largestRectangleArea(vector<int>& heights) {
+        int n=heights.size();
+        vector<int> next;
+        next=nextSmaller(heights,n);
+        vector<int> prev;
+        prev=prevSmaller(heights,n);
+        int ans=0;
+        for(int i=0;i<n;i++){
+            if(next[i]==-1) next[i]=n;
+            ans=max(ans,heights[i]*(next[i]-prev[i]-1));
+        }
+        return ans;
+    }
+
+
+
+// doubly linked list and unordered map
+class LRUCache {
+public:
+    class node{
+        public:
+        int key;
+        int value;
+        node* next;
+        node* prev;
+        node(int _key,int _value){
+            key=_key;
+            value=_value;
+        }
+    };
+    node* head=new node(-1,-1);
+    node* tail=new node(-1,-1);
+    int cap;
+    unordered_map<int,node*> mp;
+    LRUCache(int capacity) {
+        cap=capacity;
+        head->next=tail;
+        tail->prev=head;
+    }
+    void addnode(node* newnode){
+        node* temp=head->next;
+        head->next=newnode;
+        newnode->next=temp;
+        temp->prev=newnode;
+        newnode->prev=head;
+    }
+    
+    void deletenode(node* delnode){
+        node* delprev=delnode->prev;
+        node* delnext=delnode->next;
+        delprev->next=delnext;
+        delnext->prev=delprev;
+    }
+    
+    int get(int key_) {
+        if(mp.find(key_)!=mp.end()){
+            node* resnode=mp[key_];
+            int res=resnode->value;
+            mp.erase(key_);
+            deletenode(resnode);
+            addnode(resnode);
+            mp[key_]=head->next;
+            return res;
+        }
+        return -1;
+    }
+    
+    void put(int key_, int val) {
+        if(mp.find(key_)!=mp.end()){
+            deletenode(mp[key_]);
+            mp.erase(key_);
+        }
+        if(mp.size()==cap){
+            mp.erase(tail->prev->key);
+            deletenode(tail->prev);
+        }
+        addnode(new node(key_,val));
+        mp[key_]=head->next;
+    }
+};
+
+
+
+// next smaller element
+vector<int> help_classmate(vector<int> arr, int n) 
+    { 
+        vector<int> ans(n);
+        stack<int> st;
+        st.push(-1);
+        for(int i=n-1;i>=0;i--){
+            while(st.top()!=-1 && st.top()>=arr[i]) st.pop();
+            ans[i]=st.top();
+            st.push(arr[i]);
+        }
+        return ans;
+    }
+
+
+
+StockSpanner() {
+        
+    }
+    int i=0;
+    stack<pair<int,int>> st;
+    int next(int price) {
+        while(!st.empty() && st.top().first<=price) st.pop();
+        int ans;
+        if(st.empty()) ans=i+1;
+        else ans=i-st.top().second;
+        st.push({price,i});
+        i++;
+        return ans;
+    }
+
+
+
+int orangesRotting(vector<vector<int>>& grid) {
+        int m=grid.size();
+        int n=grid[0].size();
+        int minutes=0,count=0,total=0;
+        queue<pair<int,int>> q;
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(grid[i][j]!=0) total++;
+                if(grid[i][j]==2) q.push({i,j});
+            }
+        }
+        int dx[4] = {0, 0, 1, -1};
+        int dy[4] = {1, -1, 0, 0};
+        while(!q.empty()){
+            int size=q.size();
+            count+=size;
+            while(size--){
+                int x=q.front().first;
+                int y=q.front().second;
+                q.pop();
+                for(int i=0;i<4;i++){
+                    int nx=x+dx[i],ny=y+dy[i];
+                    if(ny<0 || nx<0 || ny>=n || nx>=m || grid[nx][ny]!=1) continue;
+                    grid[nx][ny]=2;
+                    q.push({nx,ny});
+                }
+            }
+            if(!q.empty()) minutes++;
+        }
+        return total==count?minutes:-1;
+    }
+
+
+
+    // sliding window maximum 
+    // this approach -> tc= n , sc= k
+    // storing in dq in decreasing order
+    // storing index in dq
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        vector<int> ans;
+        deque<int> dq;
+        for(int i=0;i<nums.size();i++){
+            if(!dq.empty() && dq.front()==i-k) dq.pop_front();// remove out of bound element
+            while(!dq.empty() && nums[dq.back()]<=nums[i]) dq.pop_back();// removing all element less than i
+            dq.push_back(i);
+            if(i>=k-1) ans.push_back(nums[dq.front()]);// after we have checked for 1st subarray of size k
+        }
+        return ans;
+    }
+
+
+
+// the celibrity problem
+// celibrity knows no one and everyone knows celibrity
+// {{0 1 0},
+//  {0 0 0}, 
+//  {0 1 0}}
+// Brute force -> n^2 -> for(0 to no of person) {for( for checking if all elements of row zero ) for( column should be one except diagonal )} 
+// Optimal 
+// put every person in stack
+// while( stack size is not 1)
+// A=st.top() then pop , B=st.top() then pop()
+// if(A knows B) push B
+// if(B knows A) push A
+// the last element left is potential answer 
+int celebrity(vector<vector<int> >& M, int n) 
+    {
+        stack<int> st;
+        for(int i=0;i<n;i++) st.push(i);
+        while(st.size()>1){
+            int a=st.top();
+            st.pop();
+            int b=st.top();
+            st.pop();
+            if(M[a][b]){
+                st.push(b);
+            }
+            else st.push(a);
+        }
+        int potentialCelibrity=st.top();
+        int count0=0;
+        int count1=0;
+        for(int i=0;i<n;i++){
+            if(M[potentialCelibrity][i]==0) count0++;
+            if(M[i][potentialCelibrity]==1) count1++;
+        }
+        if(count0==n && count1==n-1) return potentialCelibrity;
+        else return -1;
+    }
