@@ -2469,3 +2469,14 @@ int celebrity(vector<vector<int> >& M, int n)
         if(count0==n && count1==n-1) return potentialCelibrity;
         else return -1;
     }
+
+
+
+
+
+// Maximum of minimum for every window size
+
+
+
+
+
