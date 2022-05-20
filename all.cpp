@@ -2475,6 +2475,220 @@ int celebrity(vector<vector<int> >& M, int n)
 
 
 // Maximum of minimum for every window size
+// 10 20 30 50 10 70 30
+// 50 ka effect kaha kaha hoga, kaha  kaha par woh minimum hoga (only one window size)
+// find next smaller element in left and right
+// 10->7 ,20->3 ,30->2 ,50->1 ,10->7, 70->1 30->2
+// 10 answer ho sakta hai 7 aur usse chote window ka 
+// we have to find maximum of every window size
+// make a vector of window size (1 to n)
+// and store in 7 th window size 10 (update if find greater)
+// in 2 windwo size store 30
+// after storing iterate from back and if back is i+1 is greater than i update
+vector <int> maxOfMin(int arr[], int n)
+    {
+        vector<int> nextSmaller(n,n),prevSmaller(n,-1);
+        stack<int> s,t;
+        for(int i=0;i<n;i++){
+            while(!s.empty() && arr[s.top()]>=arr[i]) s.pop();
+            if(!s.empty()) prevSmaller[i]=s.top();
+            s.push(i);
+        }
+        for(int i=n-1;i>=0;i--){
+            while(!t.empty() && arr[t.top()]>=arr[i]) t.pop();
+            if(!t.empty()) nextSmaller[i]=t.top();
+            t.push(i);
+        }
+        vector<int> ans(n,0);
+        for(int i=0;i<n;i++) ans[nextSmaller[i]-prevSmaller[i]-2]=max(ans[nextSmaller[i]-prevSmaller[i]-2],arr[i]);
+        for(int i=n-2;i>=0;i--){
+            if(ans[i+1]>ans[i]) ans[i]=ans[i+1];
+        }    
+        return ans;
+    }
+
+
+
+
+// integet to roman
+// for every string , subtract from number uptill it is possible
+string intToRoman(int num) {
+        vector<pair<int,string>> v;
+        v.push_back({1000,"M"});
+        v.push_back({900,"CM"});
+        v.push_back({500,"D"});
+        v.push_back({400,"CD"});
+        v.push_back({100,"C"});
+        v.push_back({90,"XC"});
+        v.push_back({50,"L"});
+        v.push_back({40,"XL"});
+        v.push_back({10,"X"});
+        v.push_back({9,"IX"});
+        v.push_back({5,"V"});
+        v.push_back({4,"IV"});
+        v.push_back({1,"I"});
+        string ans="";
+        
+        for(int i=0;i<v.size();i++){
+            while(num>=v[i].first){
+                num-=v[i].first;
+                ans+=v[i].second;
+            }
+        }
+        return ans;
+    }
+
+
+
+
+string longestCommonPrefix(vector<string>& strs) {
+        string ans="";
+        for(int i=0;i<strs[0].size();i++){
+            bool f=1;
+            for(int j=1;j<strs.size();j++){
+                if(i>=strs[j].size() || strs[0][i]!=strs[j][i]){
+                    f=0;
+                    break;
+                }
+            }
+            if(f) ans+=strs[0][i];
+            else break;
+        }
+        return ans;
+    }
+
+
+
+// longest palindromic substring
+// for every element check if it making , a odd palindrome or a even palindrome
+string longestPalindrome(string s) {
+        int n=s.length();
+        int MaxLen=0;
+        string ans="";
+        for(int i=0;i<s.length();i++){
+            int j=i-1;
+            int k=i+1;
+            int tempLen=1;
+            while(j>=0 && k<n){
+                if(s[j]==s[k]){
+                    tempLen+=2;
+                }
+                else break;
+                j--;
+                k++;
+            }
+            if(MaxLen<tempLen){
+                MaxLen=tempLen;
+                ans=s.substr(j+1,k-j-1);
+            }
+            if(i<n-1){
+                tempLen=0;
+                j=i;
+                k=i+1;
+                while(j>=0 && k<n){
+                    if(s[j]==s[k]){
+                        tempLen+=2;
+                    }
+                    else break;
+                    j--;
+                    k++;
+                }
+                if(MaxLen<tempLen){
+                    MaxLen=tempLen;
+                    ans=s.substr(j+1,k-j-1);
+                }
+            }
+        }
+        return ans;
+    }
+
+
+
+class Solution {
+private:
+    int BASE = 1000000;
+public:
+    int repeatedStringMatch(string A, string B) {
+        if(A == B) return 1;
+        int count = 1;
+        string source = A;
+        while(source.size() < B.size()){
+            count++;
+            source+=A;
+        }
+        if(source == B) return count;
+        if(Rabin_Karp(source,B) != -1) return count;
+        if(Rabin_Karp(source+A,B) != -1) return count+1;
+        return -1;
+    }
+    int Rabin_Karp(string source, string target){
+        if(source == "" or target == "") return -1;
+        int m = target.size();
+        int power = 1;
+        for(int i = 0;i<m;i++){
+            power = (power*31)%BASE;
+        }
+        int targetCode = 0;
+        for(int i = 0;i<m;i++){
+            targetCode = (targetCode*31+target[i])%BASE;
+        }
+        int hashCode = 0;
+        for(int i = 0;i<source.size();i++){
+            hashCode = (hashCode*31 + source[i])%BASE;
+            if(i<m-1) continue;
+            if(i>=m){
+                hashCode = (hashCode-source[i-m]*power)%BASE;
+            }
+            if(hashCode<0)
+                hashCode+=BASE;
+            if(hashCode == targetCode){
+                if(source.substr(i-m+1,m) == target)
+                    return i-m+1;
+            }
+        }
+        return -1;
+    }
+};
+
+
+
+// reverse words in string
+// skip the front spaces first
+// make other pointer j , make this point to ending of the word
+string reverseWords(string s) {
+        string result;
+        int i = 0;
+        int n = s.length();
+
+        while(i < n){
+            while(i < n && s[i] == ' ') i++;
+            if(i >= n) break;
+            int j = i + 1;
+            while(j < n && s[j] != ' ') j++;
+            string sub = s.substr(i, j-i);
+            if(result.length() == 0) result = sub;
+            else result = sub + " " + result;
+            i = j+1;
+        }
+        return result;
+    }
+
+
+
+// start from back
+// if mp[s[i]]<mp[s[i+1]] then subtract mp[s[i]]
+// else add
+int romanToInt(string s) {
+        map<char,int> mp={{'M',1000},{'D',500},{'C',100},{'L',50},{'X',10},{'V',5},{'I',1}};
+        int ans=mp[s[s.length()-1]];
+        for(int i=s.length()-2;i>=0;i--){
+            if(mp[s[i]]<mp[s[i+1]]) ans-=mp[s[i]];
+            else ans+=mp[s[i]];
+        }
+        return ans;
+    }
+
+
 
 
 
