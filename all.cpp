@@ -2690,7 +2690,129 @@ int romanToInt(string s) {
 
 
 
+// generate number between the dots
+    int compareVersion(string version1, string version2) {
+        int n1=version1.length();
+        int n2=version2.length();
+        int i=0;
+        int j=0;
+        while(i<n1  || j<n2){
+            int number1=0,number2=0;
+            while(i<n1 && version1[i]!='.'){
+                number1=number1*10+(version1[i]-'0');
+                i++;
+            }
+            while(j<n2 && version2[j]!='.'){
+                number2=number2*10+(version2[j]-'0');
+                j++;
+            }
+            if(number1>number2) return 1;
+            if(number2>number1) return -1;
+            i++;
+            j++;
+        }
+        return 0;
+    }
 
 
+
+
+// count and say
+// for n=1 answer is 1
+    // for n=2 answer is 11
+    // for n=3 answer is 21
+    // for n=4 answer is 1211
+    string countAndSay(int n) {
+        // recursive
+        // if(n==1) return "1";
+        // string s=countAndSay(n-1);
+        // int count=1;
+        // string res="";
+        // for(int i=1;i<s.length();i++){
+        //     if(s[i]==s[i-1]){
+        //         count++;
+        //     }
+        //     else{
+        //         res=res+to_string(count)+s[i-1];
+        //         count=1;
+        //     }
+        // }
+        // res+=to_string(count)+s[s.length()-1];
+        // return res;
+        string ans="1";
+        for(int i=1;i<n;i++){
+            string res="";
+            int count=1;
+            for(int i=1;i<ans.length();i++){
+                if(ans[i]==ans[i-1]){
+                    count++;
+                }
+                else{
+                    res=res+to_string(count)+ans[i-1];
+                    count=1;
+                }
+            }
+            res+=to_string(count)+ans[ans.length()-1];
+            ans=res;
+        }
+        return ans;
+    }
+
+
+
+// KMP algo
+
+
+
+
+// minimum insertions to make palindrom
+// length-longest palindromic subsequence
+int solve(int i,int j,string &text1,string &text2,vector<vector<int>> &dp){
+        if(i==-1 || j==-1 ) return 0;
+        if(dp[i][j]!=-1) return dp[i][j];
+        if(text1[i]==text2[j]) return dp[i][j]=1+solve(i-1,j-1,text1,text2,dp);
+        else 
+        return dp[i][j]=max(solve(i-1,j,text1,text2,dp),solve(i,j-1,text1,text2,dp));
+    }
+    int longestPalindromeSubseq(string s) {
+        string text1=s;
+        reverse(s.begin(),s.end());
+        string text2=s;
+        vector<vector<int>> dp(text1.length(),vector<int>(text2.length(),-1));
+        return solve(text1.length()-1,text2.length()-1,text1,text2,dp);
+    }
+    int minInsertions(string s) {
+        return s.length()-longestPalindromeSubseq(s);
+    }
+
+
+
+// char array
+// increment for one and decrement for the other
+bool isAnagram(string s, string t) {
+        if(s.length()!=t.length()) return false;
+        vector<int> v(26,0);
+        for(int i=0;i<s.length();i++) v[s[i]-'a']++;
+        for(int i=0;i<t.length();i++) v[t[i]-'a']--;
+        for(int i=0;i<26;i++) if(v[i]!=0) return false;
+        return true;
+    }
+
+
+
+
+// z[i] represents length of string after i (including i) , which is also present in prefix
+// brute -> n^2
+// optimal -> n
+vector<int> z_function(string s) {
+    int n = (int) s.length();
+    vector<int> z(n);
+    for (int i = 1, l = 0, r = 0; i < n; ++i) {
+        if (i <= r) z[i] = min (r - i + 1, z[i - l]); // i before r(we have already calculated)
+        while (i + z[i] < n && s[z[i]] == s[i + z[i]]) ++z[i]; // add if further presetn
+        if (i + z[i] - 1 > r) l = i, r = i + z[i] - 1; // update l and r if found greater
+    }
+    return z;
+}
 
 
