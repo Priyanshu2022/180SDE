@@ -2816,3 +2816,306 @@ vector<int> z_function(string s) {
 }
 
 
+
+// map will have hd and node's data
+// queue will store node and hd
+vector <int> bottomView(Node *root) {
+         vector<int> ans; 
+        if(root == NULL) return ans; 
+        map<int,int> mpp; 
+        queue<pair<Node*, int>> q; 
+        q.push({root, 0}); 
+        while(!q.empty()) {
+            auto it = q.front(); 
+            q.pop();  
+            Node* node = it.first; 
+            int line = it.second; 
+            mpp[line] = node->data; 
+            if(node->left != NULL) {
+                q.push({node->left, line-1}); 
+            }
+            if(node->right != NULL) {
+                q.push({node->right, line + 1}); 
+            }
+            
+        }
+        
+        for(auto it : mpp) {
+            ans.push_back(it.second); 
+        }
+        return ans;
+    }
+
+
+
+// iterative inorder
+// left root right
+// while curr is not null push left
+// if null check if stack is empty
+// take top push in ans and push right
+vector < int > inOrderTrav(node * curr) {
+  vector < int > inOrder;
+  stack < node * > s;
+  while (true) {
+    if (curr != NULL) {
+      s.push(curr);
+      curr = curr -> left;
+    } else {
+      if (s.empty()) break;
+      curr = s.top();
+      inOrder.push_back(curr -> data);
+      s.pop();
+      curr = curr -> right;
+    }
+  }
+  return inOrder;
+}
+
+// iterative preorder
+// root left right
+vector < int > preOrderTrav(node * curr) {
+  vector < int > preOrder;
+  if (curr == NULL)
+    return preOrder;
+
+  stack < node * > s;
+  s.push(curr);
+
+  while (!s.empty()) {
+    node * topNode = s.top();
+    preOrder.push_back(topNode -> data);
+    s.pop();
+    if (topNode -> right != NULL)
+      s.push(topNode -> right);
+    if (topNode -> left != NULL)
+      s.push(topNode -> left);
+  }
+  return preOrder;
+
+}
+
+//iterative postorder
+// left right root
+// using two stacks
+// push root in s1
+// run while s1 is not empty
+// take top of s1 push in s2
+// then push it's left and right in s1
+vector < int > postOrderTrav(node * curr) {
+
+  vector < int > postOrder;
+  if (curr == NULL) return postOrder;
+
+  stack < node * > s1;
+  stack < node * > s2;
+  s1.push(curr);
+  while (!s1.empty()) {
+    curr = s1.top();
+    s1.pop();
+    s2.push(curr);
+    if (curr -> left != NULL)
+      s1.push(curr -> left);
+    if (curr -> right != NULL)
+      s1.push(curr -> right);
+  }
+  while (!s2.empty()) {
+    postOrder.push_back(s2.top() -> data);
+    s2.pop();
+  }
+  return postOrder;
+}
+
+// using one stack
+
+
+
+
+// maintain level
+void solve(Node * root,vector<int> &ans,int level){
+    if(root==NULL ) return;
+    if(level==ans.size()){
+        ans.push_back(root->data);
+    }
+    solve(root->left,ans,level+1);
+    solve(root->right,ans,level+1);
+}
+vector<int> leftView(Node *root)
+{
+   vector<int> ans;
+   solve(root,ans,0);
+   return ans;
+}
+
+// maximum width of binary tree
+// queue will store node and index 
+int widthOfBinaryTree(TreeNode* root) {
+        if(!root) return 0;
+        int ans=0;
+        queue<pair<TreeNode*,long long int>> q;
+        q.push({root,0});
+        while(!q.empty()){
+            int size=q.size();
+            long long int mini=q.front().second;
+             int first,last;
+            for(int i=0;i<size;i++){
+                long long int cur_index=q.front().second-mini;
+                TreeNode* node=q.front().first;
+                q.pop();
+                if(i==0) first=cur_index;
+                if(i==size-1) last=cur_index;
+                if(node->left){
+                    q.push({node->left,cur_index*2+1});
+                }
+                if(node->right){
+                    q.push({node->right,cur_index*2+2});
+                }
+            }
+            ans=max(ans,last-first+1);
+        }
+        return ans;
+    }
+
+
+
+
+// morris traversal
+vector < int > inorderTraversal(node * root) {
+  vector < int > inorder;
+  node * cur = root;
+  while (cur != NULL) {
+    if (cur -> left == NULL) { // if curr's left is null, no left therefore root will be printed and cur will move right
+      inorder.push_back(cur -> data);
+      cur = cur -> right;
+    } else { // if there exist a left
+      node * prev = cur -> left;
+      while (prev->right!=NULL && prev -> right != cur) { // find last guy in the left subtree , it should not point to cur
+        prev = prev -> right;
+      }
+
+      if (prev -> right == NULL) { // link not made
+        prev -> right = cur; // make link to cur
+        cur = cur -> left; // move cur to left
+      } else {
+        prev -> right = NULL; // if already link present (prev->right ==cur), make it point to null
+        inorder.push_back(cur -> data); // push cur as , left already visited
+        cur = cur -> right; // move to right
+      }
+    }
+  }
+  return inorder;
+}
+
+// for preorder , instead of pushing after right , push while marking link
+vector < int > preorderTraversal(node * root) {
+  vector < int > inorder;
+  node * cur = root;
+  while (cur != NULL) {
+    if (cur -> left == NULL) {
+      inorder.push_back(cur -> data);
+      cur = cur -> right;
+    } else {
+      node * prev = cur -> left;
+      while (prev->right!=NULL && prev -> right != cur) {
+        prev = prev -> right;
+      }
+
+      if (prev -> right == NULL) { 
+        prev -> right = cur;
+        inorder.push_back(cur -> data);
+        cur = cur -> left;
+      } else {
+        prev -> right = NULL;
+        cur = cur -> right;
+      }
+    }
+  }
+  return inorder;
+}
+
+
+
+// map will have hd and node's data
+// queue will store node and hd
+vector<int> topView(Node *root)
+    {
+        vector<int> ans; 
+        if(root == NULL) return ans; 
+        //  hd  root'data
+        map<int,int> mpp; 
+        queue<pair<Node*, int>> q; 
+        q.push({root, 0}); 
+        while(!q.empty()) {
+            auto it = q.front(); 
+            q.pop();  
+            Node* node = it.first; 
+            int line = it.second; 
+            if(mpp.find(line) == mpp.end())
+            mpp[line] = node->data; 
+            if(node->left != NULL) {
+                q.push({node->left, line-1}); 
+            }
+            if(node->right != NULL) {
+                q.push({node->right, line + 1}); 
+            }
+            
+        }
+        
+        for(auto it : mpp) {
+            ans.push_back(it.second); 
+        }
+        return ans;
+    }
+
+
+
+// vertical traversal
+// map will have hd and map of level and node's value
+// queue will store node and pair of hd and level
+vector<int> verticalOrder(Node *root)
+    {
+        // hd       level  node's value 
+        map<int,map<int,vector<int>>> mp;
+        vector<int> ans;
+        if(root==NULL) return ans;
+        
+        //        node        hd  level
+        queue<pair<Node*,pair<int,int>>> q;
+        q.push({root,{0,0}});
+        while(!q.empty()){
+            auto temp=q.front();
+            q.pop();
+            int hd=temp.second.first;
+            int lvl=temp.second.second;
+            mp[hd][lvl].push_back(temp.first->data);
+            if(temp.first->left) q.push({temp.first->left,{hd-1,lvl+1}});
+            if(temp.first->right) q.push({temp.first->right,{hd+1,lvl+1}});
+        }
+        for(auto i:mp){
+            for(auto j:i.second){
+                for(auto cur:j.second){
+                    ans.push_back(cur);
+                }
+            }
+        }
+        return ans;
+    }
+
+
+
+
+// if root is null return false
+// push in path
+// then match with x , if matched return true, else check if left or right return true, if yes return true
+// other wise pop back and return false
+bool getPath(node * root, vector < int > & arr, int x) {
+  if (!root) return false;
+  arr.push_back(root -> data);
+  if (root -> data == x) return true;
+  if (getPath(root -> left, arr, x) || getPath(root -> right, arr, x)) return true;  
+  arr.pop_back();
+  return false;
+}
+
+
+
+
