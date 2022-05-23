@@ -3119,3 +3119,194 @@ bool getPath(node * root, vector < int > & arr, int x) {
 
 
 
+// Preorder inorder postorder in a single traversal
+
+
+
+
+
+pair<int,int> solve(TreeNode* root){
+        if(root==NULL){
+            return {true,0};
+        }
+        pair<int,int> left=solve(root->left);
+        pair<int,int> right=solve(root->right);
+        int dif=abs(left.second-right.second);
+        if(left.first && right.first && dif<=1 ){
+            return {true,max(left.second,right.second)+1};
+        }
+        else{
+            return {false,max(left.second,right.second)+1};
+        }
+    }
+    bool isBalanced(TreeNode* root) {
+        return solve(root).first;
+    }
+
+
+
+
+
+void traverseLeft(Node* root, vector<int> &ans){
+    if(root==NULL || (root->left==NULL && root->right==NULL)) return;
+    ans.push_back(root->data);
+    if(root->left){
+        traverseLeft(root->left,ans);
+    }
+    else traverseLeft(root->right,ans);
+}
+void traverseRight(Node* root,vector<int> &ans){
+    if(root==NULL || (root->left==NULL && root->right==NULL)) return ;
+    if(root->right){
+        traverseRight(root->right,ans);
+    }
+    else traverseRight(root->left,ans);
+    ans.push_back(root->data);
+}
+void traverseLeaf(Node* root,vector<int> &ans){
+    if(root==NULL) return ;
+    if(root->left==NULL && root->right==NULL) ans.push_back(root->data);
+    traverseLeaf(root->left,ans);
+    traverseLeaf(root->right,ans);
+}
+vector <int> boundary(Node *root)
+{
+    vector<int> ans;
+    ans.push_back(root->data);
+    traverseLeft(root->left,ans);
+    
+    // if pass with the root and only one root present , then ans will have two roots
+    traverseLeaf(root->left,ans);
+    traverseLeaf(root->right,ans);
+
+    traverseRight(root->right,ans);
+    
+    return ans;
+}
+
+
+
+
+
+// diameter of the binary tree first element of the pair will store the dia and the other will store height
+pair<int,int> diameterFast(Node* root) {
+        //base case
+        if(root == NULL) {
+            pair<int,int> p = make_pair(0,0);
+            return p;
+        }
+        
+        pair<int,int> left = diameterFast(root->left);
+        pair<int,int> right = diameterFast(root->right);
+        
+        int op1 = left.first;
+        int op2 = right.first;
+        int op3 = left.second + right.second + 1;
+        
+        pair<int,int> ans;
+        ans.first = max(op1, max(op2, op3));;
+        ans.second = max(left.second , right.second) + 1;
+
+        return ans;
+    }
+    int diameter(Node* root) {
+    
+        return diameterFast(root).first;
+        
+    }
+
+
+
+
+int maxDepth(TreeNode* root) {
+        if(root==NULL) return 0;
+        return 1+max(maxDepth(root->left),maxDepth(root->right));
+    }
+
+
+
+
+TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if(root==NULL) return NULL;
+        if(root==p || root==q) return root;
+        TreeNode* left=lowestCommonAncestor(root->left,p,q);
+        TreeNode* right=lowestCommonAncestor(root->right,p,q);
+        if(left!=NULL && right!=NULL) return root;
+        else if(left!=NULL && right==NULL) return left;
+        else if(left==NULL && right!=NULL) return right;
+        else return NULL;
+    }
+
+
+
+
+vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> ans;
+        if(root==NULL){
+            return ans;
+        }
+        queue<TreeNode*> q;
+        q.push(root);
+        while(!q.empty()){
+            int size=q.size();
+            vector<int> temp;
+            for(int i=0;i<size;i++){
+                TreeNode* it=q.front();
+                q.pop();
+                if(it->left){
+                    q.push(it->left);
+                }
+                if(it->right){
+                    q.push(it->right);
+                }
+                temp.push_back(it->val);
+            }
+            ans.push_back(temp);
+        }
+        return ans;
+    }
+
+
+
+
+bool isSameTree(TreeNode* p, TreeNode* q) {
+        if(p==NULL || q==NULL) return p==NULL&&q==NULL;
+        // if(p==NULL && q==NULL) return true;
+        // if(p==NULL && q!=NULL) return false;
+        // if(p!=NULL && q==NULL) return false;
+        bool left=isSameTree(p->left,q->left);
+        bool right=isSameTree(p->right,q->right);
+        bool val= p->val==q->val;
+        if(left && right && val) return true;
+        else return false;
+    }
+
+
+
+
+vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+        vector<vector<int>> ans;
+        if(root==NULL) return ans;
+        queue<TreeNode*> q;
+        q.push(root);
+        bool f=1;
+        while(!q.empty()){
+            int size=q.size();
+            vector<int> temp(size);
+            for(int i=0;i<size;i++){
+                int index=(f)?i:(size-i-1);
+                TreeNode* cur=q.front();
+                q.pop();
+                temp[index]=cur->val;
+                if(cur->left){
+                    q.push(cur->left);
+                }
+                if(cur->right){
+                    q.push(cur->right);
+                }
+            }
+            ans.push_back(temp);
+            f=!f;
+        }
+        return ans;
+    }
