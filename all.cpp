@@ -3310,3 +3310,149 @@ vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
         }
         return ans;
     }
+
+
+
+
+
+
+// maximum sum path 
+// maintain a answer variable
+// ans = max(ans, left +right+root->val),if either of the side is negative , then we would have already made it zero
+int solve(TreeNode* root,int &ans){
+        if(root==NULL){
+            return 0;
+        }
+        int left=max(0,solve(root->left,ans));
+        int right=max(0,solve(root->right,ans));
+        ans=max(ans,left+right+root->val);
+        return root->val+max(left,right);
+    }
+public:
+    int maxPathSum(TreeNode* root) {
+        int ans=INT_MIN;
+        solve(root,ans);
+        return ans;
+    }
+
+
+
+
+// if cur's left exists
+    // cur ka predecessor nikalo (left jaake right jaate jao)
+    // then uske right ko cur ke right se connect karo 
+    // and mark cur's right as it's left
+    // and mark left as null
+    // after that move cur to right
+    void flatten(TreeNode* root) {
+        TreeNode* cur=root;
+        while(cur){
+            if(cur->left){
+                TreeNode* pred=cur->left;
+                while(pred->right){
+                    pred=pred->right;
+                }
+                pred->right=cur->right;
+                cur->right=cur->left;
+                cur->left=NULL;
+            }
+            cur=cur->right;
+        }
+    }
+
+
+
+
+void mirror(Node* node) {
+        // code here
+        if(!node) return ;
+        swap(node->left,node->right);
+        mirror(node->left);
+        mirror(node->right);
+    }
+
+
+
+
+pair<int,int> solve(Node* root){
+        if(root==NULL){
+            return {true,0};
+        }
+        if(root->left==NULL && root->right==NULL){
+            return {true,root->data};
+        }
+        pair<int,int> left=solve(root->left);
+        pair<int,int> right=solve(root->right);
+        int sum=left.second+right.second;
+        if(left.first && right.first && sum==root->data) return {true,sum+root->data};
+        else return {false,sum+root->data};
+    }
+    bool isSumTree(Node* root)
+    {
+         return solve(root).first;
+    }
+
+
+
+bool solve(TreeNode* first,TreeNode* second){
+        if(first==NULL && second==NULL ) return true;
+        if(first && second && first->val==second->val)
+        return solve(first->left,second->right)&&solve(first->right,second->left);
+        return false;
+    }
+public:
+    bool isSymmetric(TreeNode* root) {
+        return solve(root,root);
+    }
+
+
+
+// we want to increment index and want to reflect that in every call 
+    // tc after using map => nlong + n =nlogn
+    // sc = n of map , stack space = 
+    Node* solve(int &index,int in[],int pre[],int inorderStart,int inorderEnd,int n,map<int,int> &nodeToIndex){
+        if(index>=n || inorderStart>inorderEnd){
+            return NULL;
+        }
+        int element=pre[index];
+        Node* root=new Node(element);
+        int position=nodeToIndex[element];
+        index++;
+        root->left=solve(index,in,pre,inorderStart,position-1,n,nodeToIndex);
+        root->right=solve(index,in,pre,position+1,inorderEnd,n,nodeToIndex);
+        return root;
+    }
+    Node* buildTree(int in[],int pre[], int n)
+    {
+        // to get inorder index at O(1)
+        map<int,int> nodeToIndex;
+        for(int i=0;i<n;i++){
+            nodeToIndex[in[i]]=i;
+        }
+        int preOrderStart=0;
+        return solve(preOrderStart,in,pre,0,n-1,n,nodeToIndex);
+    }
+
+
+
+
+Node* solve(int &index,int in[],int post[],int inorderStart,int inorderEnd,int n,map<int,int> &nodeToIndex){
+        if(index<0 || inorderStart>inorderEnd){
+            return NULL;
+        }
+        int element=post[index];
+        Node* root=new Node(element);
+        int position=nodeToIndex[element];
+        index--;
+        root->right=solve(index,in,post,position+1,inorderEnd,n,nodeToIndex);
+        root->left=solve(index,in,post,inorderStart,position-1,n,nodeToIndex);
+        return root;
+    }
+Node *buildTree(int in[], int post[], int n) {
+        map<int,int> nodeToIndex;
+        for(int i=0;i<n;i++){
+            nodeToIndex[in[i]]=i;
+        }
+        int postOrderStart=n-1;
+        return solve(postOrderStart,in,post,0,n-1,n,nodeToIndex);
+}
