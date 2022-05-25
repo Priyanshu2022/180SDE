@@ -3456,3 +3456,129 @@ Node *buildTree(int in[], int post[], int n) {
         int postOrderStart=n-1;
         return solve(postOrderStart,in,post,0,n-1,n,nodeToIndex);
 }
+
+
+
+
+TreeNode* build(vector<int> &preorder,int &i,int bound){
+        if(i==preorder.size() || preorder[i]>bound) return NULL;
+        TreeNode* root=new TreeNode(preorder[i]);
+        i++;
+        root->left=build(preorder,i,root->val);
+        root->right=build(preorder,i,bound);
+        return root;
+    }
+    TreeNode* bstFromPreorder(vector<int>& preorder) {
+        int i=0;
+        return build(preorder,i,INT_MAX);
+    }
+
+
+
+TreeNode* solve(int start ,int end,vector<int> &nums){
+        if(start>end) return NULL;
+        int mid=(start+end)/2;
+        TreeNode* root=new TreeNode(nums[mid]);
+        root->left=solve(start,mid-1,nums);
+        root->right=solve(mid+1,end,nums);
+        return root;
+    }
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        int mid=(nums.size()-1)/2;
+        TreeNode* root=new TreeNode(nums[mid]);
+        root->left=solve(0,mid-1,nums);
+        root->right=solve(mid+1,nums.size()-1,nums);
+        return root;
+    }
+
+
+
+TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if(root==NULL) return NULL;
+        if(root->val<p->val && root->val<q->val){
+            return lowestCommonAncestor(root->right,p,q);
+        }
+        else if(root->val>p->val && root->val>q->val){
+            return lowestCommonAncestor(root->left,p,q);
+        }
+        else return root;
+    }
+
+
+
+Node* connect(Node* root) {
+        if(root==NULL) return NULL;
+        queue<Node*> q;
+        q.push(root);
+        while(!q.empty()){
+            int size=q.size();
+            for(int i=0;i<size;i++){
+              Node* cur=q.front();
+              q.pop();
+              if(i<size-1){
+                  Node* nex=q.front();
+                  cur->next=nex;
+              }
+              else cur->next=NULL;
+                
+                if(cur->left){
+                    q.push(cur->left);
+                }
+                if(cur->right){
+                    q.push(cur->right);
+                }
+            }
+            
+        }
+        return root;
+    }
+
+
+
+
+void findPreSuc(Node* root, Node*& pre, Node*& suc, int key)
+{
+    Node* temp=root;
+    while(temp){
+        if(temp->key>key){
+            suc=temp;
+            temp=temp->left;
+        }
+        else temp=temp->right;
+    }
+    temp=root;
+    while(temp){
+        if(temp->key<key){
+            pre=temp;
+            temp=temp->right;
+        }
+        else temp=temp->left;
+    }
+}
+
+
+
+TreeNode* searchBST(TreeNode* root, int val) {
+        if(root==NULL) return NULL;
+        if(root->val==val) return root;
+        if(root->val>val) return searchBST(root->left,val);
+        return searchBST(root->right,val);
+    }
+
+
+
+
+bool solve(TreeNode* root,long mini,long maxi){
+        if(root==NULL) return true;
+        if(root->val <=mini || root->val >=maxi){
+            return false;
+        }
+        return solve(root->left,mini,root->val)&&solve(root->right,root->val,maxi);
+    }
+public:
+    bool isValidBST(TreeNode* root) {
+        return solve(root,LONG_MIN,LONG_MAX);
+    }
+
+
+
