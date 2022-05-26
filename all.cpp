@@ -3582,3 +3582,182 @@ public:
 
 
 
+
+
+class BSTIterator {
+    stack <TreeNode*> st;
+public:
+    void pushAll(TreeNode* root){
+        while(root!=NULL){
+            st.push(root);
+            root=root->left;
+        }
+    }
+    BSTIterator(TreeNode* root) {
+        pushAll(root);
+    }
+    
+    int next() {
+        TreeNode* cur=st.top();
+        st.pop();
+        pushAll(cur->right);
+        return cur->val;
+    }
+    
+    bool hasNext() {
+        return !st.empty();
+    }
+};
+
+
+
+// floor and ceil in a bst
+
+
+
+// kth smallest element in bst
+// maintain a count cur
+// in inorder we get the sorted order ( access and check between left and right calls)
+// call for left and if does not give -1 return left;
+int solve(TreeNode* root,int k,int &cur){
+        if(root==NULL) return -1;
+        int left=solve(root->left,k,cur);
+        if(left!=-1) return left;
+        if(cur==k-1) return root->val;
+        cur++;
+        int right=solve(root->right,k,cur);
+        return right;
+    }
+    int kthSmallest(TreeNode* root, int k) {
+        int cur=0;
+        return solve(root,k,cur);
+    }
+
+
+
+
+// maximum sum bst in binary tree
+
+
+
+
+
+// root will be given to the serialize function to convert it into the string
+// then that string will be converted to tree by deserialize function
+// Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        if(!root) return "";
+        
+        string s ="";
+        queue<TreeNode*> q;
+        q.push(root);
+        while(!q.empty()) {
+           TreeNode* curNode = q.front();
+           q.pop();
+           if(curNode==NULL) s.append("#,");
+           else s.append(to_string(curNode->val)+',');
+           if(curNode != NULL){
+               q.push(curNode->left);
+               q.push(curNode->right);            
+           }
+        }
+        return s;
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        if(data.size() == 0) return NULL; 
+        stringstream s(data);
+        string str; 
+        getline(s, str, ',');
+        TreeNode *root = new TreeNode(stoi(str));
+        queue<TreeNode*> q; 
+        q.push(root); 
+        while(!q.empty()) {
+            
+            TreeNode *node = q.front(); 
+            q.pop(); 
+            
+            getline(s, str, ',');
+            if(str == "#") {
+                node->left = NULL; 
+            }
+            else {
+                TreeNode* leftNode = new TreeNode(stoi(str)); 
+                node->left = leftNode; 
+                q.push(leftNode); 
+            }
+            
+            getline(s, str, ',');
+            if(str == "#") {
+                node->right = NULL; 
+            }
+            else {
+                TreeNode* rightNode = new TreeNode(stoi(str)); 
+                node->right = rightNode;
+                q.push(rightNode); 
+            }
+        }
+        return root; 
+    }
+
+
+
+
+
+// two sum in a bst
+// next and before 
+// if reverse true means next elese before
+class BSTIterator {
+    stack<TreeNode *> myStack;
+    bool reverse = true; 
+public:
+    BSTIterator(TreeNode *root, bool isReverse) {
+        reverse = isReverse; 
+        pushAll(root);
+    }
+
+    /** @return whether we have a next smallest number */
+    bool hasNext() {
+        return !myStack.empty();
+    }
+
+    /** @return the next smallest number */
+    int next() {
+        TreeNode *tmpNode = myStack.top();
+        myStack.pop();
+        if(!reverse) pushAll(tmpNode->right);
+        else pushAll(tmpNode->left);
+        return tmpNode->val;
+    }
+
+private:
+    void pushAll(TreeNode *node) {
+        for(;node != NULL; ) {
+             myStack.push(node);
+             if(reverse == true) {
+                 node = node->right; 
+             } else {
+                 node = node->left; 
+             }
+        }
+    }
+};
+class Solution {
+public:
+    bool findTarget(TreeNode* root, int k) {
+        if(!root) return false; 
+        BSTIterator l(root, false); 
+        BSTIterator r(root, true); 
+        
+        int i = l.next(); 
+        int j = r.next(); 
+        while(i<j) {
+            if(i + j == k) return true; 
+            else if(i + j < k) i = l.next(); 
+            else j = r.next(); 
+        }
+        return false; 
+    }
+};
+
