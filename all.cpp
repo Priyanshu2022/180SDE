@@ -3761,3 +3761,346 @@ public:
     }
 };
 
+
+
+
+// bipartite graph
+// graph which can be coloured using 2 colors
+// bfs , if any componenet gives false then the answer is false
+// maintain a color array
+bool bipartiteBfs(int node,vector<int> adj[],vector<int> &color){
+        queue<int> q;
+        q.push(node);
+        while(!q.empty()){
+            int temp=q.front();
+            q.pop();
+            for(auto it:adj[temp]){
+                if(color[it]==-1) {
+                    color[it]=1-color[temp];
+                    q.push(it);
+                }
+                else if(color[it]==color[temp]) return false;
+            }
+        }
+        return true;
+    }
+    bool isBipartite(int V, vector<int>adj[]){
+        vector<int> color(V,-1);
+        for(int i=0;i<V;i++){
+            if(color[i]==-1){
+                if(bipartiteBfs(i,adj,color)==false) return false;
+            }
+        }
+        return true;
+    }
+
+
+// dfs
+// maintain color
+bool bipartiteDfs(int node, vector<int> adj[], int color[]) {
+    for(auto it : adj[node]) {
+        if(color[it] == -1) {
+            color[it] = 1 - color[node];
+            if(!bipartiteDfs(it, adj, color)) {
+                return false; 
+            }
+        } else if(color[it] == color[node]) return false; 
+    }
+    return true; 
+}
+bool checkBipartite(vector<int> adj[], int n) {
+    int color[n];
+    memset(color, -1, sizeof color); 
+    for(int i = 0;i<n;i++) {
+        if(color[i] == -1) {
+            color[i] = 1;
+            if(!bipartiteDfs(i, adj, color)) {
+                return false;
+            }
+        } 
+    }
+    return true; 
+}
+
+
+
+
+
+// run dfs, maintain a map
+    Node* dfs(Node* node,unordered_map<Node*,Node*> &mp){
+        vector<Node*> neighbor;
+        Node* clone=new Node(node->val);
+        mp[node]=clone;
+        for(auto it:node->neighbors){
+            if(mp.find(it)==mp.end()){
+                neighbor.push_back(dfs(it,mp));
+            }
+            else{
+                neighbor.push_back(mp[it]);
+            }
+        }
+        clone->neighbors=neighbor;
+        return clone;
+    }
+    Node* cloneGraph(Node* node) {
+        unordered_map<Node*,Node*> mp;
+        if(node==NULL) return NULL;
+        if(node->neighbors.size()==0){
+            Node* clone=new Node(node->val);
+            return clone;
+        }
+        return dfs(node,mp);
+    }
+
+
+
+
+// cycle detection in undirected
+// dfs -> maintain parent to differentiate between next and previous node
+bool checkForCycle(int node, int parent, vector < int > & vis, vector < int > adj[]) {
+      vis[node] = 1;
+      for (auto it: adj[node]) {
+        if (!vis[it]) {
+          if (checkForCycle(it, node, vis, adj))
+            return true;
+        } else if (it != parent)
+          return true;
+      }
+
+      return false;
+    }
+    bool isCycle(int V, vector < int > adj[]) {
+      vector < int > vis(V + 1, 0);
+      for (int i = 0; i < V; i++) {
+        if (!vis[i]) {
+          if (checkForCycle(i, -1, vis, adj)) return true;
+        }
+      }
+
+      return false;
+    } 
+
+
+// bfs -> queue will be of node and parent
+bool checkForCycle(int s, int V, vector<int> adj[], vector<int> &visited)
+    {
+        // Create a queue for BFS
+        queue<pair<int, int>> q;
+        visited[s] = true;
+        q.push({s, -1});
+        while (!q.empty())
+        {
+            int node = q.front().first;
+            int par = q.front().second;
+            q.pop();
+ 
+            for (auto it : adj[node])
+            {
+                if (!visited[it])
+                {
+                    visited[it] = true;
+                    q.push({it, node});
+                }
+                else if (par != it)
+                    return true;
+            }
+        }
+        return false;
+    }
+    bool isCycle(int V, vector<int> adj[])
+    {
+        vector<int> vis(V - 1, 0);
+        for (int i = 1; i <= V; i++)
+        {
+            if (!vis[i])
+            {
+                if (checkForCycle(i, V, adj, vis))
+                    return true;
+            }
+        }
+    }
+
+
+
+// for directed graph
+// dfs discussed above will not work
+// as we can visit same node if direction is same
+// maintain vis and dfsvis(if the node is visited in the current movement)
+bool checkCycle(int node, vector < int > adj[], int vis[], int dfsVis[]) {
+      vis[node] = 1;
+      dfsVis[node] = 1;
+      for (auto it: adj[node]) {
+        if (!vis[it]) {
+          if (checkCycle(it, adj, vis, dfsVis)) return true;
+        } else if (dfsVis[it]) {
+          return true;
+        }
+      }
+      dfsVis[node] = 0;
+      return false;
+    }
+    bool isCyclic(int N, vector < int > adj[]) {
+      int vis[N], dfsVis[N];
+      memset(vis, 0, sizeof vis);
+      memset(dfsVis, 0, sizeof dfsVis);
+
+      for (int i = 0; i < N; i++) {
+        if (!vis[i]) {
+          if (checkCycle(i, adj, vis, dfsVis)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+
+// bfs 
+// we will check if we can form topo sort then ,then no cycle
+// count the total elements of topo sort if they are equal to n , then it does not have a cycle
+
+
+
+
+
+// graph 
+// to store in adjacency list space -> n+2e (n=no. of nodes, e =no of edges) 
+// if weights are also stored -> n+2e+2e
+
+// bfs -> tc = n+e, sc=n+e+n+n
+vector < int > bfsOfGraph(int V, vector < int > adj[]) {
+      vector < int > bfs;
+      vector < int > vis(V, 0);
+      queue < int > q;
+      q.push(0);
+      vis[0] = 1;
+      while (!q.empty()) {
+        int node = q.front();
+        q.pop();
+        bfs.push_back(node);
+
+        for (auto it: adj[node]) {
+          if (!vis[it]) {
+            q.push(it);
+            vis[it] = 1;
+          }
+        }
+      }
+
+      return bfs;
+    }
+
+// dfs -> tc=n+e , sc=n+e+n+n
+void dfs(int node, vector<int> &vis, vector<int> adj[], vector<int> &storeDfs) {
+        storeDfs.push_back(node); 
+        vis[node] = 1; 
+        for(auto it : adj[node]) {
+            if(!vis[it]) {
+                dfs(it, vis, adj, storeDfs); 
+            }
+        }
+    }
+    vector<int>dfsOfGraph(int V, vector<int> adj[]){
+        vector<int> storeDfs; 
+        vector<int> vis(V+1, 0); 
+      for(int i = 1;i<=V;i++) {
+        if(!vis[i]) dfs(i, vis, adj, storeDfs); 
+      }
+        return storeDfs; 
+    }
+
+
+
+
+// no of islands -> dfs
+void dfs(vector<vector<char>> &grid,vector<vector<int>> &vis,int i,int j){
+        if(i<0 || j<0 || i>=grid.size() || j>=grid[0].size()) return; 
+        if(grid[i][j]=='0') return;
+        if(vis[i][j]!=-1) return ;
+        vis[i][j]=1;
+        dfs(grid,vis,i+1,j);
+        dfs(grid,vis,i-1,j);
+        dfs(grid,vis,i,j+1);
+        dfs(grid,vis,i,j-1);
+    }
+    int numIslands(vector<vector<char>>& grid) {
+        int ans=0;
+        vector<vector<int>> vis(grid.size(),vector<int>(grid[0].size(),-1));
+        for(int i=0;i<grid.size();i++){
+            for(int j=0;j<grid[0].size();j++){
+                if(grid[i][j]=='1' && vis[i][j]==-1){
+                    ans++;
+                    dfs(grid,vis,i,j);
+                }
+            }
+        }
+        return ans;
+    }
+
+
+
+
+// topological sort
+// can only be possible of directed acyclic graph
+// if u->v is a edge then u always appears before v
+
+// using dfs -> n+e (tc)
+// run dfs and in every node if not visited
+// put in answer after recursively calling all it's adjacent
+// then reverse the answer array
+void solve(int i,vector<int> adj[],vector<int> &vis,vector<int> &ans,int V){
+        vis[i]=1;
+        
+        for(auto it:adj[i]){
+            if(!vis[it]){
+                solve(it,adj,vis,ans,V);
+            }
+        }
+        ans.push_back(i);
+     
+    }
+    vector<int> topoSort(int V, vector<int> adj[]) 
+    {
+        vector<int> vis(V+1,0);
+        vector<int> ans;
+        for(int i=0;i<V;i++){
+            if(!vis[i]){
+                solve(i,adj,vis,ans,V);
+            }
+        }
+        reverse(ans.begin(),ans.end());
+        return ans;
+    }
+
+
+// using bfs
+// maintain indegree and push all indegree node's of zeros to the queue
+// not run bfs while queue is not empty , and whenever go to adjacent reduce indegree and check if zero
+vector<int> topo(int N, vector<int> adj[]) {
+        queue<int> q; 
+        vector<int> indegree(N, 0); 
+        for(int i = 0;i<N;i++) {
+            for(auto it: adj[i]) {
+                indegree[it]++; 
+            }
+        }
+        
+        for(int i = 0;i<N;i++) {
+            if(indegree[i] == 0) {
+                q.push(i); 
+            }
+        }
+        vector<int> topo;
+        while(!q.empty()) {
+            int node = q.front(); 
+            q.pop(); 
+            topo.push_back(node);
+            for(auto it : adj[node]) {
+                indegree[it]--;
+                if(indegree[it] == 0) {
+                    q.push(it); 
+                }
+            }
+        }
+        return topo;
+    }
