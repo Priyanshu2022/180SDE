@@ -4104,3 +4104,258 @@ vector<int> topo(int N, vector<int> adj[]) {
         }
         return topo;
     }
+
+
+
+
+// dijkstra is not possible in a graph with negative cycle
+// make a distTo vector
+// iterate over all edges , n-1 times , and update if possible
+// run one more time for check , if yet it any edge is getting relaxed , means graph has a negative cycle
+int isNegativeWeightCycle(int n, vector<vector<int>>edges){
+        vector<int> distTo(n,1e7);
+        for(int i=1;i<=n-1;i++){
+            for(auto it:edges){
+                if(distTo[it[1]]>distTo[it[0]]+it[2]){
+                    distTo[it[1]]=distTo[it[0]]+it[2];
+                }
+            }
+        }
+        bool f=0;
+        for(auto it:edges){
+            if(distTo[it[1]]>distTo[it[0]]+it[2]){
+                f=1;
+                break;
+            }
+        }
+        if(f) return 1;
+        else return 0;
+    }
+
+
+
+
+
+// dijkstra -> single source shortest path
+// vector<pair<int,int>> v[V] -> for each vertex , number of vertex connected with edges
+// min heap
+// distTo vector
+// update if possible
+vector <int> dijkstra(int V, vector<vector<int>> adj[], int S)
+    {
+        vector<pair<int,int>> v[V];
+        for(int i=0;i<V;i++){
+            // v[i].push_back({adj[i][0],adj[i][1]});
+            for(auto cur:adj[i]){
+                v[i].push_back({cur[0],cur[1]});
+            }
+        }
+        priority_queue<pair<int,int>,vector<pair<int,int> >,greater<pair<int,int> > > pq;
+        vector<int> distTo(V,INT_MAX);
+        distTo[S]=0;
+        pq.push({0,S});
+        while(!pq.empty()){
+            int dist=pq.top().first;
+            int node=pq.top().second;
+            pq.pop();
+            for(auto it:v[node]){
+                int next=it.first;
+                int nexdis=it.second;
+                if(nexdis+dist<distTo[next]){
+                    distTo[next]=dist+nexdis;
+                    pq.push({distTo[next],next});
+                }
+            }
+        }
+        return distTo;
+    }
+
+
+
+
+
+// floyd warshall
+// all pair shortest path
+// mark diagonal elements as zero
+// rest all as int max
+// now n^3 loop (1st one for pivot , i.e if we can go through this pivot with less distance)
+void shortest_distance(vector<vector<int>>&matrix){
+        int n=matrix.size();
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(i==j) matrix[i][j]=0;
+                else if(matrix[i][j]==-1) matrix[i][j]=INT_MAX;
+            }
+        }
+        for(int k=0;k<n;k++){
+            for(int i=0;i<n;i++){
+                for(int j=0;j<n;j++){
+                    if(matrix[i][k]!=INT_MAX && matrix[k][j]!=INT_MAX && (matrix[i][k]+matrix[k][j]<matrix[i][j])){
+                        matrix[i][j]=matrix[i][k]+matrix[k][j];
+                    }
+                }
+            }
+        }
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(matrix[i][j]==INT_MAX) matrix[i][j]=-1;
+            }
+        }
+    }
+
+
+
+
+
+// mst using kruskals
+// first transfer adj to all edges list
+// then sort according to weigth
+// then iterate on this edges 
+// if have different parent , add weith to answer
+    int findPar(int node,vector<int> &parent){
+        if(node==parent[node]){
+            return node;
+        }
+        return parent[node]=findPar(parent[node],parent);
+    }
+    void Union(int u,int v,vector<int> &rank,vector<int> &parent){
+        u=findPar(u,parent);
+        v=findPar(v,parent);
+        if(rank[u]<rank[v]){
+            parent[u]=v;
+        }
+        else if(rank[v]<rank[u]){
+            parent[v]=u;
+        }
+        else{
+            parent[v]=u;
+            rank[u]++;
+        } 
+    }
+    int spanningTree(int V, vector<vector<int>> adj[])
+    {
+        vector<pair<int,pair<int,int>>> v;
+        for(int i=0;i<V;i++){
+            for(auto it:adj[i]){
+                v.push_back({it[1],{i,it[0]}});
+                
+            }
+        }
+        vector<int> rank(V,0);
+        vector<int> parent(V);
+        for(int i=0;i<V;i++){
+            parent[i]=i;
+        }
+        sort(v.begin(),v.end());
+        int ans=0;
+        for(int i=0;i<v.size();i++){
+            if(findPar(v[i].second.first,parent)!=findPar(v[i].second.second,parent)){
+                ans+=v[i].first;
+                Union(v[i].second.first,v[i].second.second,rank,parent);
+            }
+        }
+        return ans;
+    }
+
+
+
+
+
+
+// three array 
+// key -> which will store the weight of connected
+// parent -> paretn of the node
+// mstSet -> is part of mst
+// priority queue -> pair<int,int> -> weight and node 
+
+#include<bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int N,m;
+    cin >> N >> m;
+    vector<pair<int,int> > adj[N]; 
+    int a,b,wt;
+    for(int i = 0; i<m ; i++){
+        cin >> a >> b >> wt;
+        adj[a].push_back(make_pair(b,wt));
+        adj[b].push_back(make_pair(a,wt));
+    }   
+    int parent[N];   
+    int key[N];   
+    bool mstSet[N]; 
+  
+    for (int i = 0; i < N; i++) key[i] = INT_MAX, mstSet[i] = false; 
+    priority_queue< pair<int,int>, vector <pair<int,int>> , greater<pair<int,int>> > pq;
+    key[0] = 0; 
+    parent[0] = -1; 
+    pq.push({0, 0});
+    while(!pq.empty())
+    { 
+        int u = pq.top().second; 
+        pq.pop(); 
+        mstSet[u] = true; 
+        for (auto it : adj[u]) {
+            int v = it.first;
+            int weight = it.second;
+            if (mstSet[v] == false && weight < key[v]) {
+                parent[v] = u;
+                key[v] = weight; 
+                pq.push({key[v], v});    
+            }
+        }
+            
+    } 
+    for (int i = 1; i < N; i++) 
+        cout << parent[i] << " - " << i <<" \n"; 
+    return 0;
+}
+
+
+
+
+// strongly connected comoponent (directed graph)
+// Kosaraju's Algorithm
+// from every node of that component we can reach to every other node
+    // find toposort of the graph
+    // transpose the graph
+    // then run dfs according to topo sort
+    void dfs(int node,vector<int> adj[],vector<int> &vis,stack<int> &st){
+        vis[node]=1;
+        for(auto it:adj[node]){
+            if(!vis[it]) dfs(it,adj,vis,st);
+        }
+        st.push(node);
+    }
+    void revdfs(int node,vector<int> transpose[],vector<int> &vis){
+        vis[node]=1;
+        for(auto it:transpose[node]){
+            if(!vis[it]) revdfs(it,transpose,vis);
+        }
+    }
+    int kosaraju(int V, vector<int> adj[])
+    {
+        stack<int> st;
+        vector<int> vis(V,0);
+        for(int i=0;i<V;i++) if(!vis[i]) dfs(i,adj,vis,st);
+        vector<int> transpose[V];
+        for(int i=0;i<V;i++){
+            vis[i]=0;
+            for(auto it:adj[i]){
+                transpose[it].push_back(i);
+            }
+        }
+        int ans=0;
+        while(!st.empty()){
+            int node=st.top();
+            st.pop();
+            if(!vis[node]){
+                ans++;
+                revdfs(node,transpose,vis);
+            }
+        }
+        return ans;
+    }
+
+
+    
