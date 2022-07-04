@@ -3768,27 +3768,30 @@ public:
 // graph which can be coloured using 2 colors
 // bfs , if any componenet gives false then the answer is false
 // maintain a color array
-bool bipartiteBfs(int node,vector<int> adj[],vector<int> &color){
+bool bfs(vector<vector<int>> &graph,vector<int> &color,int src){
         queue<int> q;
-        q.push(node);
+        q.push(src);
+        color[src]=1;
         while(!q.empty()){
-            int temp=q.front();
+            int node=q.front();
             q.pop();
-            for(auto it:adj[temp]){
-                if(color[it]==-1) {
-                    color[it]=1-color[temp];
+            for(auto it:graph[node]){
+                if(color[it]==-1){
+                    color[it]=1-color[node];
                     q.push(it);
                 }
-                else if(color[it]==color[temp]) return false;
+                else if(color[it]==color[node]){
+                    return false;
+                }
             }
         }
         return true;
     }
-    bool isBipartite(int V, vector<int>adj[]){
-        vector<int> color(V,-1);
-        for(int i=0;i<V;i++){
+    bool isBipartite(vector<vector<int>>& graph) {
+        vector<int> color(graph.size(),-1);
+        for(int i=0;i<graph.size();i++){
             if(color[i]==-1){
-                if(bipartiteBfs(i,adj,color)==false) return false;
+                if(!bfs(graph,color,i)) return false;
             }
         }
         return true;
@@ -3821,8 +3824,6 @@ bool checkBipartite(vector<int> adj[], int n) {
     }
     return true; 
 }
-
-
 
 
 
